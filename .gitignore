@@ -1,4 +1,10 @@
-# Custom
+# File extensions
+*.ipynb
+*.png
+*.csv
+*.parquet
+
+# Folders
 examples/
 data/
 .vscode/

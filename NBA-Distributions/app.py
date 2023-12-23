@@ -1,0 +1,117 @@
+import numpy as np
+import pandas as pd
+from pandas import DataFrame
+from plotnine.ggplot import ggplot
+from plotnine import (
+    aes,
+    labs,
+    geom_density,
+    theme,
+    theme_xkcd,
+    theme_538,
+    guide_legend,
+    guides,
+    element_text,
+    element_blank,
+    scale_fill_manual
+)
+
+from shiny import App, ui, render, reactive
+
+data_DIR = "/var/data/shiny/"
+df = pd.read_parquet(data_DIR + "NBA_Player_Distribution.parquet")
+
+players = list(df["Player"].unique())
+seasons = list(df["Season"].astype(str).unique())
+vars = ['Pts', 'Min', 'FGM', 'FGA',
+       'FG Pct', 'FG3M', 'FG3A', 'FG3 Pct', 'FTM', 'FTA', 'FT Pct', 'OReb',
+       'DReb', 'Reb', 'Ast', 'Stl', 'Blk', 'Tov', 'PF']
+
+app_ui = ui.page_fluid(
+    ui.card(
+    ui.panel_title("NBA Player Stat Distribution"),
+        ui.card_footer(ui.markdown("""
+                **By**: [SravanNBA](https://twitter.com/SravanNBA/)
+            """
+            )
+        )
+    ),
+    ui.card(
+        ui.markdown(""" 
+            Plotting Density and comparing them for various boxscores stats for a players from 2004-Current.
+            Choose the stat, then player 1 and season, and finally player 2 and season.
+            """
+        ),
+    
+    ),
+    ui.layout_sidebar(
+        ui.sidebar(
+            ui.input_selectize("var","Stat",vars, selected="Pts"),
+            ui.card(
+                ui.input_selectize("player_name1","Player 1",players, selected="LeBron James"),
+                ui.input_selectize("season1","Season",seasons, selected="2024"),
+                
+            ),
+            ui.card(
+                ui.input_selectize("player_name2","Player 2",players, selected="Giannis Antetokounmpo"),
+                ui.input_selectize("season2","Season",seasons, selected="2024"),
+            ),
+        ),
+        ui.output_plot("plt", width="800px", height="600px"),
+    ),
+    # ui.output_data_frame("output_table"),
+)
+
+def server(input, output, session):
+    # ...
+    @reactive.Calc
+    def filtered_df() -> pd.DataFrame:
+        dff = df.query(f"(Player == '{input.player_name1()}' & Season == {input.season1()}) | (Player == '{input.player_name2()}' & Season == {input.season2()}) ")
+
+        return dff
+    
+    @render.data_frame
+    def output_table():
+        display_df = filtered_df()
+        display_df = display_df.sort_values(by=["Player","Season","Game Date"])
+        return render.DataGrid(display_df, filters=False)
+    
+    @render.plot(alt="Player Stat Distribution")
+    def plt():
+        df1 = filtered_df()
+        var = input.var()
+        plot = (
+            ggplot(df1)  
+            + geom_density(
+                aes(x=var,fill="Player Season"),
+                alpha=0.5,
+            )
+            + scale_fill_manual(values=["blue","red"])
+
+            + labs(
+                x=var,
+                y="Density",
+                title=f"NBA Stat Distribution: {var}",
+                caption="@SravanNBA | source: nba.com/stats",
+            )
+            + theme_xkcd(base_size=14)
+            # + theme_538(base_size=12)
+            + theme(
+                plot_title=element_text(face="bold", size=20),
+                plot_subtitle=element_text(size=14),
+                plot_margin=0.025,
+                figure_size=[8,6]
+            )
+            + theme(
+                legend_title=element_blank(),
+                legend_position = [0.82,0.82],
+                legend_box_margin=0,
+                legend_background=element_blank(),
+                legend_box_background = element_blank(),
+            )
+            +  guides(fill=guide_legend(ncol=1))
+        )
+    
+        return plot
+    
+app = App(app_ui, server)
