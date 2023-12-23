@@ -39,7 +39,9 @@ app_ui = ui.page_fluid(
     ui.card(
         ui.markdown(""" 
             Plotting Density and comparing them for various boxscores stats for a players from 2004-Current.
-            Choose the stat, then player 1 and season, and finally player 2 and season.
+            Choose the stat, then player 1 and season, and finally player 2 and season.  
+            Higher the Density, the more frequent that event is.  
+            Inspired by my NBA Age Distribution tweets: [1](https://twitter.com/SravanNBA/status/1723550795302617520), [2](https://twitter.com/SravanNBA/status/1729870792534724808)
             """
         ),
     
