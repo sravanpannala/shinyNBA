@@ -1,6 +1,6 @@
+import os
 import numpy as np
 import pandas as pd
-from pandas import DataFrame
 from plotnine.ggplot import ggplot
 from plotnine import (
     aes,
@@ -18,6 +18,20 @@ from plotnine import (
 
 from shiny import App, ui, render, reactive
 
+logs_DIR = "/var/log/shiny-server/"
+
+def get_viewcount():
+    app_name = os.path.basename(os.getcwd())
+    logs = [s for s in  os.listdir(logs_DIR) if app_name in s]
+    connections = 0
+    for log in logs:
+        with open(logs_DIR + log,"r") as f:
+            log_text = f.read()
+        connections += log_text.count("open")
+    return connections
+
+connections = str(get_viewcount())
+
 data_DIR = "/var/data/shiny/"
 df = pd.read_parquet(data_DIR + "NBA_Player_Distribution.parquet")
 
@@ -28,11 +42,12 @@ vars = ['Pts', 'Min', 'FGM', 'FGA',
        'DReb', 'Reb', 'Ast', 'Stl', 'Blk', 'Tov', 'PF']
 
 app_ui = ui.page_fluid(
+    # ui.head_content(ui.include_js("gtag.js",method="inline")),
     ui.card(
     ui.panel_title("NBA Player Stat Distribution"),
         ui.card_footer(ui.markdown("""
-                **By**: [SravanNBA](https://twitter.com/SravanNBA/)
-            """
+                **By**: [SravanNBA](https://twitter.com/SravanNBA/) | **App views**: {0}
+            """.format(connections)
             )
         )
     ),
@@ -40,35 +55,29 @@ app_ui = ui.page_fluid(
         ui.markdown(""" 
             Plotting Density and comparing them for various boxscores stats for a players from 2004-Current.
             Choose the stat, then player 1 and season, and finally player 2 and season.  
-            Higher the Density, the more frequent that event is.  
-            Inspired by my NBA Age Distribution tweets: [1](https://twitter.com/SravanNBA/status/1723550795302617520), [2](https://twitter.com/SravanNBA/status/1729870792534724808)
+            Higher the Density (probability of the event to occur), the more frequent that event is. You can read more about density plots [here](https://en.wikipedia.org/wiki/Kernel_density_estimation)  
+            This app is inspired by my NBA Age Distribution tweets: [1](https://twitter.com/SravanNBA/status/1723550795302617520), [2](https://twitter.com/SravanNBA/status/1729870792534724808)
             """
         ),
     
     ),
-    ui.layout_sidebar(
-        ui.sidebar(
-            ui.input_selectize("var","Stat",vars, selected="Pts"),
-            ui.card(
-                ui.input_selectize("player_name1","Player 1",players, selected="LeBron James"),
-                ui.input_selectize("season1","Season",seasons, selected="2024"),
-                
-            ),
-            ui.card(
-                ui.input_selectize("player_name2","Player 2",players, selected="Giannis Antetokounmpo"),
-                ui.input_selectize("season2","Season",seasons, selected="2024"),
-            ),
-        ),
-        ui.output_plot("plt", width="800px", height="600px"),
+    ui.row(
+        ui.column(2, ui.input_selectize("var","Stat",vars, selected="Pts")),
+        ui.column(3, ui.input_selectize("player_name1","Player 1",players, selected="LeBron James")),
+        ui.column(1, ui.input_selectize("season1","Season",seasons, selected="2024")),
+        ui.column(3, ui.input_selectize("player_name2","Player 2",players, selected="Giannis Antetokounmpo")),
+        ui.column(1, ui.input_selectize("season2","Season",seasons, selected="2024")),
+
     ),
-    # ui.output_data_frame("output_table"),
+    ui.output_plot("plt", width="800px", height="600px"),
+
 )
 
 def server(input, output, session):
     # ...
     @reactive.Calc
     def filtered_df() -> pd.DataFrame:
-        dff = df.query(f"(Player == '{input.player_name1()}' & Season == {input.season1()}) | (Player == '{input.player_name2()}' & Season == {input.season2()}) ")
+        dff = df.query(f'(Player == "{input.player_name1()}" & Season == {input.season1()}) | (Player == "{input.player_name2()}" & Season == {input.season2()}) ')
 
         return dff
     

@@ -1,4 +1,4 @@
-
+import os
 import numpy as np
 import pandas as pd
 import matplotlib.pyplot as plt
@@ -6,6 +6,21 @@ from plotnine.ggplot import ggplot
 from plotnine import geom_density
 
 from shiny import App, ui, render, reactive
+
+logs_DIR = "/var/log/shiny-server/"
+
+def get_viewcount():
+    app_name = os.path.basename(os.getcwd())
+    logs = [s for s in  os.listdir(logs_DIR) if app_name in s]
+    connections = 0
+    for log in logs:
+        with open(logs_DIR + log,"r") as f:
+            log_text = f.read()
+        connections += log_text.count("open")
+    return connections
+
+connections = str(get_viewcount())
+
 
 data_DIR = "/var/data/shiny/"
 
@@ -34,11 +49,14 @@ questions = [
 ]
 
 app_ui = ui.page_fluid(
+    # ui.head_content(ui.include_js("gtag.js",method="inline")),
     ui.card(
     ui.panel_title("NBA Comparision Tool"),
         ui.card_footer(ui.markdown("""
-                **Data and Idea**: [automaticnba](https://twitter.com/automaticnba/) | **Application**: [SravanNBA](https://twitter.com/SravanNBA/)
-            """
+                **Data and Idea**: [automaticnba](https://twitter.com/automaticnba/) | 
+                **Application**: [SravanNBA](https://twitter.com/SravanNBA/) | 
+                **App Views**: {0}
+            """.format(connections)
             )
         )
     ),
