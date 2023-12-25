@@ -6,6 +6,7 @@ from plotnine.ggplot import ggplot
 from plotnine import geom_density
 
 from shiny import App, ui, render, reactive
+from shiny.types import ImgData
 
 logs_DIR = "/var/log/shiny-server/"
 
@@ -24,8 +25,9 @@ connections = str(get_viewcount())
 
 data_DIR = "/var/data/shiny/"
 
-df = pd.read_csv(data_DIR + "NBA_Player_Comparison.csv")
-df = df.drop(columns=["Blank"])
+img_DIR = data_DIR + "player_images/"
+
+df = pd.read_parquet(data_DIR + "NBA_Player_Comparison_V3.parquet")
 
 questions = [
     "How often do you shoot the ball?",
@@ -45,13 +47,15 @@ questions = [
     "How skilled of a rim protector are you?",
     "How active of a help defender are you?",
     "How skilled of an offensive rebounder are you?",
-    "How skilled of a defensive rebounder are you?"
+    "How skilled of a defensive rebounder are you?",
+    "How often do you drive to the basket?",
+    "How often do you post up?",
 ]
 
 app_ui = ui.page_fluid(
     # ui.head_content(ui.include_js("gtag.js",method="inline")),
     ui.card(
-    ui.panel_title("NBA Comparision Tool"),
+    ui.panel_title("NBA Pickup Comparision Finder"),
         ui.card_footer(ui.markdown("""
                 **Data and Idea**: [automaticnba](https://twitter.com/automaticnba/) | 
                 **Application**: [SravanNBA](https://twitter.com/SravanNBA/) | 
@@ -63,9 +67,11 @@ app_ui = ui.page_fluid(
     # ui.h2("NBA Comparision Tool"),
     ui.card(
         ui.markdown(""" 
-            Simply answer these 18 basic questions about your basketball ability to 
-            see which NBA players from 2016-17 to 2022-23 your skills most match with  
-            **Numbers for 2023-24 not available yet**  
+            Simply answer these **20 basic questions** about your basketball ability to 
+            see which NBA players from **2016-17** to **2022-23** your skills most match with  
+                           
+            Numbers for **2023-24** not available yet
+            Comparing to players with atleas t **500** minutes played during a season  
             """
         ),
     
@@ -100,20 +106,29 @@ app_ui = ui.page_fluid(
         ui.column(4, ui.input_slider("q16", questions[16], 0, 100, 50)),
         ui.column(4, ui.input_slider("q17", questions[17], 0, 100, 50)),
     ),
+    ui.row(
+        ui.column(4, ui.input_slider("q18", questions[18], 0, 100, 50)),
+        ui.column(4, ui.input_slider("q19", questions[19], 0, 100, 50)),
+        # ui.column(4, ui.input_slider("q17", questions[17], 0, 100, 50)),
+    ),
     ui.layout_column_wrap(
         ui.value_box(
             "Player Most Similar to you is:",
             ui.output_text("similar_player"),
+            showcase=ui.output_image("image",inline=True),
+            # showcase_layout="bottom",
             theme="purple",
+            # fill= True,
             full_screen=True,
         ),
+        width = 1/2,
     ),
     # ui.card(
     #     ui.card_header("Player most similar to you is:"),
     #     ui.output_text_verbatim("similar_player"),
     # ),
     ui.card(
-        ui.card_header("Similarity Table"),
+        ui.card_header(ui.h4("Similarity Table")),
         ui.output_data_frame("similarity_score"),
     ),
 )
@@ -141,15 +156,17 @@ def server(input, output, session):
             input.q15(),
             input.q16(),
             input.q17(),
+            input.q18(),
+            input.q19(),
         ]
         df1 = df.copy()
         entry = np.array(inputs)
-        matrix = df1.iloc[:,2:].to_numpy()
+        matrix = df1.iloc[:,4:].to_numpy()
         smat = matrix - entry
-        norm = np.linalg.norm(smat, axis=1) 
-        df1["Similarity Score"] = 100-np.round(np.sqrt(norm)/18*100,1)
-        # df1.insert(1,"Similarity Score",df1.pop("Similarity Score"))
-        # df1 = df1.sort_values(by="Similarity Score", ascending=False).reset_index(drop=True)
+        # norm = np.linalg.norm(smat, ord=2, axis=1) 
+        # df1["Similarity Score"] = 100-np.round(norm/20,1)
+        norm = np.linalg.norm(smat, ord=1, axis=1) 
+        df1["Similarity Score"] = 100-np.round(norm/20,1)
         df1 = df1.nlargest(10,"Similarity Score")
 
         return df1
@@ -163,8 +180,22 @@ def server(input, output, session):
     @render.text
     def similar_player():
         text_df = filtered_df()
-        txt = text_df.iloc[0,0]
+        txt = str(text_df.iloc[0,1]) + " " + str(text_df.iloc[0,2])
         return f"{txt}"
+    
+    @render.text
+    def similar_pID():
+        text_df = filtered_df()
+        pID = str(text_df.iloc[0,0])
+        # img = f'<img src="https://cdn.nba.com/headshots/nba/latest/260x190/{pID}.png" alt="alternatetext">'
+        return pID
 
+    @render.image
+    def image():
+        from pathlib import Path
+
+        dir = Path(__file__).resolve().parent
+        img: ImgData = {"src": str(img_DIR) + str(similar_pID()) + ".png", "height": "100px"}
+        return img
 
 app = App(app_ui, server)
