@@ -8,7 +8,7 @@ from plotnine import (
     geom_density,
     theme,
     theme_xkcd,
-    theme_538,
+    # theme_538,
     guide_legend,
     guides,
     element_text,
@@ -16,13 +16,18 @@ from plotnine import (
     element_rect,
     scale_fill_manual,
     scale_x_continuous,
-    scale_x_discrete,
+    # scale_x_discrete,
+    scale_y_continuous,
+    geom_point,
+    geom_smooth,
+    scale_color_manual,
+    # facet_wrap,
 )
 from mizani.formatters import percent_format
 
-import matplotlib as mpl
-import shutil
-shutil.rmtree(mpl.get_cachedir())
+# import matplotlib as mpl
+# import shutil
+# shutil.rmtree(mpl.get_cachedir())
 
 
 from shiny import App, ui, render, reactive
@@ -39,9 +44,12 @@ def get_viewcount():
         connections += log_text.count("open")
     return connections
 
-connections = str(get_viewcount())
-connections = "100"
+# Testing
+# connections = "100"
+# data_DIR = "C:\\Users\\pansr\\Documents\\shinyNBA\\data\\"
 
+# Deployment
+connections = str(get_viewcount())
 data_DIR = "/var/data/shiny/"
 
 df = pd.read_parquet(data_DIR + "NBA_Player_Distribution.parquet")
@@ -54,7 +62,7 @@ vars = ['Pts', 'Min', 'FGM', 'FGA',
         'DReb', 'Reb', 'Ast', 'Stl', 'Blk', 'Tov', 'PF',
         'ORtg', 'DRtg', 'NetRtg', 'Ast Pct', 'Ast/Tov', 'Ast Ratio',
         'OReb Pct', 'DReb Pct', 'Reb Pct', 'Tov Ratio', 'eFG Pct', 'TS Pct',
-        'Usage Pct', 'Pace', 'Poss', 'PIE']
+        'USG Pct', 'Pace', 'Poss', 'PIE']
 
 app_ui = ui.page_fluid(
     # ui.head_content(ui.include_js("gtag.js",method="inline")),
@@ -87,6 +95,7 @@ app_ui = ui.page_fluid(
 
     ),
     ui.output_plot("plt", width="800px", height="600px"),
+    ui.output_plot("plt2", width="800px", height="600px"),
 
 )
 
@@ -136,7 +145,7 @@ def server(input, output, session):
             + labs(
                 x=var,
                 y="Density",
-                title=f"NBA Stat Distribution:  {var}",
+                title=f"NBA Stat Distriubtion:  {var}",
                 caption="@SravanNBA | source: nba.com/stats",
             )
             + theme_xkcd(base_size=14)
@@ -158,5 +167,59 @@ def server(input, output, session):
         )
     
         return plot
+
+    @render.plot(alt="Player Stat Mean")
+    def plt2():
+        df1 = filtered_df()
+        var = input.var()
+        scale_y = []
+        kwargs_legend = {"alpha":0.0}
+        if "Pct" in var:
+            scale_y = scale_y_continuous(labels=percent_format())
+            if var == "FT Pct":
+                limits = [.50,1.00]
+                scale_y = scale_y_continuous(labels=percent_format(), limits = limits)
+        elif var in ["ORtg","DRtg"]:
+            x_breaks = np.arange(90,140,5)
+            x_labels = list(x_breaks.astype(str))
+            # scale_y = scale_y_continuous(breaks=x_breaks, labels= x_labels, limits = [x_breaks[0],x_breaks[-1]])
+            scale_y = scale_y_continuous(limits = [x_breaks[0],x_breaks[-1]])
+        elif var in ["NRtg"]:
+            x_breaks = np.arange(-25,25,5)
+            x_labels = list(x_breaks.astype(str))
+            scale_y = scale_y_continuous(breaks=x_breaks, labels= x_labels, limits = [x_breaks[0],x_breaks[-1]])
+        plot = (
+            ggplot(df1,aes(x="Games Played",y=var,color="Player Season"))  
+            + geom_point()
+            + geom_smooth(size=2,se=False,method="lowess",span=0.4)
+            # + facet_wrap(facets = "~ Player Season",ncol=1)
+            + scale_color_manual(values=["blue","red"])
+            + scale_y
+            + labs(
+                x="Games Played",
+                y=var,
+                title=f"NBA Stat Trends:  {var}",
+                caption="@SravanNBA | source: nba.com/stats",
+            )
+            + theme_xkcd(base_size=14)
+            # + theme_538(base_size=14)
+            + theme(
+                plot_title=element_text(face="bold", size=22),
+                plot_subtitle=element_text(size=14),
+                plot_margin=0.025,
+                figure_size=[8,6]
+            )
+            + theme(
+                legend_title=element_blank(),
+                legend_position = [0.32,0.82],
+                legend_box_margin=0,
+                legend_background=element_rect(color="grey", size=0.001,**kwargs_legend),
+                legend_box_background = element_blank(),
+            )
+            +  guides(color=guide_legend(ncol=1))
+        )
+    
+        return plot  
+
     
 app = App(app_ui, server)
