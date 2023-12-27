@@ -89,7 +89,7 @@ vars = [
 app_ui = ui.page_fluid(
     # ui.head_content(ui.include_js("gtag.js",method="inline")),
     ui.card(
-    ui.panel_title("NBA Player Stat Distribution"),
+    ui.panel_title("NBA Player Stat Distribution and Trends"),
         ui.card_footer(ui.markdown("""
                 **By**: [SravanNBA](https://twitter.com/SravanNBA/) | **App views**: {0}
             """.format(connections)
@@ -98,7 +98,7 @@ app_ui = ui.page_fluid(
     ),
     ui.card(
         ui.markdown(""" 
-            Plotting Density and comparing them for various boxscores stats for a players from 2004-Current.  
+            Plotting Density & Trends for various boxscores stats for a players from 2013-Current.  
             Choose the **stat**, then **Player 1** and **Season**, and finally **Player 2** and **Season**.  
             If you want to plot only a Single Player's distribution, select **None** for Player 2.  
             Higher the Density (probability of the event to occur), the more frequent that event is. You can read more about density plots [here](https://en.wikipedia.org/wiki/Kernel_density_estimation)  
@@ -167,7 +167,7 @@ def server(input, output, session):
             + labs(
                 x=var,
                 y="Density",
-                title=f"NBA Stat Distriubtion:  {var}",
+                title=f"NBA Stat Distribution:  {var}",
                 caption="@SravanNBA | source: nba.com/stats",
             )
             + theme_xkcd(base_size=14)

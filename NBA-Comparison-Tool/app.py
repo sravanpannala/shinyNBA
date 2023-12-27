@@ -55,7 +55,7 @@ questions = [
 app_ui = ui.page_fluid(
     # ui.head_content(ui.include_js("gtag.js",method="inline")),
     ui.card(
-    ui.panel_title("NBA Pickup Comparision Finder"),
+    ui.panel_title("NBA Pickup Comparision Finder v3.0"),
         ui.card_footer(ui.markdown("""
                 **Data and Idea**: [automaticnba](https://twitter.com/automaticnba/) | 
                 **Application**: [SravanNBA](https://twitter.com/SravanNBA/) | 
@@ -70,8 +70,8 @@ app_ui = ui.page_fluid(
             Simply answer these **20 basic questions** about your basketball ability to 
             see which NBA players from **2016-17** to **2022-23** your skills most match with  
                            
+            Comparing to players with at least **500** minutes played during a season | 
             Numbers for **2023-24** not available yet
-            Comparing to players with atleas t **500** minutes played during a season  
             """
         ),
     
@@ -115,11 +115,10 @@ app_ui = ui.page_fluid(
         ui.value_box(
             "Player Most Similar to you is:",
             ui.output_text("similar_player"),
+            ui.output_text("similar_year"),
+            theme="purple",
             showcase=ui.output_image("image",inline=True),
             # showcase_layout="bottom",
-            theme="purple",
-            # fill= True,
-            full_screen=True,
         ),
         width = 1/2,
     ),
@@ -180,8 +179,15 @@ def server(input, output, session):
     @render.text
     def similar_player():
         text_df = filtered_df()
-        txt = str(text_df.iloc[0,1]) + " " + str(text_df.iloc[0,2])
+        txt = str(text_df.iloc[0,2])
         return f"{txt}"
+
+    @render.text
+    def similar_year():
+        text_df = filtered_df()
+        txt = str(text_df.iloc[0,1]) 
+        return f"{txt}"
+
     
     @render.text
     def similar_pID():
@@ -195,7 +201,7 @@ def server(input, output, session):
         from pathlib import Path
 
         dir = Path(__file__).resolve().parent
-        img: ImgData = {"src": str(img_DIR) + str(similar_pID()) + ".png", "height": "100px"}
+        img: ImgData = {"src": str(img_DIR) + str(similar_pID()) + ".png", "height": "80px"}
         return img
 
 app = App(app_ui, server)
