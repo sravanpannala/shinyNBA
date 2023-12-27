@@ -57,12 +57,34 @@ df = pd.read_parquet(data_DIR + "NBA_Player_Distribution.parquet")
 players = list(df["Player"].unique())
 players.append("None")
 seasons = list(df["Season"].astype(str).unique())
-vars = ['Pts', 'Min', 'FGM', 'FGA', 
-        'FG Pct', 'FG3M', 'FG3A', 'FG3 Pct', 'FTM', 'FTA', 'FT Pct', 'OReb',
-        'DReb', 'Reb', 'Ast', 'Stl', 'Blk', 'Tov', 'PF',
-        'ORtg', 'DRtg', 'NetRtg', 'Ast Pct', 'Ast/Tov', 'Ast Ratio',
-        'OReb Pct', 'DReb Pct', 'Reb Pct', 'Tov Ratio', 'eFG Pct', 'TS Pct',
-        'USG Pct', 'Pace', 'Poss', 'PIE']
+vars = [
+        'Pts', 'Min', 'FGM', 'FGA', 'FG %', 'FG3M', 'FG3A',
+        'FG3 %', 'FTM', 'FTA', 'FT %', 'OReb', 'DReb', 'Reb', 'Ast', 'Stl',
+        'Blk', 'Tov', 'PF' , 'Plus Minus', 'ORtg', 'DRtg', 'NetRtg',
+        'Ast %', 'Ast/Tov', 'Ast Ratio', 'OReb %', 'DReb %', 'Reb %',
+        'Tov Ratio', 'eFG %', 'TS %', 'USG %', 'Pace', 'Poss', 'PIE',
+        'Off Poss', 'Def Poss', 'Drives', 'Drive FGM', 'Drive FGA', 'Drive FTM',
+        'Drive FTA', 'Drive Points', 'Drive Passes', 'Drive Asts', 'Drive Tovs',
+        'Drive Fouls', 'Passes Made', 'Passes Received', 'FT Asts',
+        'Secondary Asts', 'Potential Asts',
+        'Adj Asts', 'Ast Pts', 'Def Rim FGM', 'Def Rim FGA', 'Touches',
+        'Front Court Touches', 'Time Of Poss', 'Seconds Per Touch',
+        'Dribbles Per Touch', 'Elbow Touches', 'Elbow Touch FGM',
+        'Elbow Touch FGA', 'Elbow Touch FTM', 'Elbow Touch FTA',
+        'Elbow Touch Points', 'Elbow Touch Passes', 'Elbow Touch Asts',
+        'Elbow Touch Tovs', 'Elbow Touch Fouls', 'Paint Touches',
+        'Paint Touch FGM', 'Paint Touch FGA', 'Paint Touch FTM',
+        'Paint Touch FTA', 'Paint Touch Points', 'Paint Touch Passes',
+        'Paint Touch Asts', 'Paint Touch Tovs', 'Paint Touch Fouls',
+        'Post Touches',
+        'Post Touch FGM', 'Post Touch FGA', 'Post Touch FTM', 'Post Touch FTA',
+        'Post Touch Points', 'Post Touch Passes', 'Post Touch Asts',
+        'Post Touch Tovs', 'Post Touch Fouls', 'OReb Contest', 'OReb Uncontest',
+        'OReb Chances', 'OReb Chance Defer', 'DReb Contest', 'DReb Uncontest',
+        'DReb Chances', 'DReb Chance Defer', 'Feet', 'Miles', 'Miles Off',
+        'Miles Def', 'Avg Speed', 'Avg Speed Off', 'Avg Speed Def', 'Season',
+        'Player Season',
+       ]
 
 app_ui = ui.page_fluid(
     # ui.head_content(ui.include_js("gtag.js",method="inline")),
