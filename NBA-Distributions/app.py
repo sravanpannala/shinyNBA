@@ -71,7 +71,7 @@ advanced_a = [
 
 playmaking_a = [
     'Ast %', 'Ast/Tov', 'Ast Ratio','Tov Ratio', 'Passes Made', 'Passes Received',
-    'FT Asts', 'Secondary Asts', 'Potential Asts', 'Potential Asts',
+    'FT Asts', 'Secondary Asts', 'Potential Asts', 'Potential Asts', 'Adj Asts',
     'Drive Points', 'Drive Asts', 'Drives',
 ]
 
@@ -112,8 +112,8 @@ app_ui = ui.page_fluid(
     ui.card(
         ui.markdown(""" 
             Plotting Density & Trends for various boxscores stats for a players from **2013-Current**.  
-            Higher the Density (probability of the event to occur), the more frequent that event is. You can read more about density plots [here](https://en.wikipedia.org/wiki/Kernel_density_estimation)  
-            This app is inspired by my NBA Age Distribution tweets: [1](https://twitter.com/SravanNBA/status/1723550795302617520), [2](https://twitter.com/SravanNBA/status/1729870792534724808)  
+            In the Density plot, higher the Y value, the more frequent that event is. More information [here](https://en.wikipedia.org/wiki/Kernel_density_estimation)  
+            For the Trends plot, the trend line is a smooth conditional mean. More information [here](https://ggplot2.tidyverse.org/reference/geom_smooth.html)  
             [**Glossary of Stats**](https://www.nba.com/stats/help/glossary)
             """
         ),
@@ -220,7 +220,7 @@ def server(input, output, session):
             + scale_x
             + labs(
                 x=var,
-                y="Density",
+                y="Freqency",
                 title=f"NBA Stat Distribution:  {var}",
                 caption="@SravanNBA",
             )
