@@ -82,25 +82,22 @@ vars = [
         'Post Touch Tovs', 'Post Touch Fouls', 'OReb Contest', 'OReb Uncontest',
         'OReb Chances', 'OReb Chance Defer', 'DReb Contest', 'DReb Uncontest',
         'DReb Chances', 'DReb Chance Defer', 'Feet', 'Miles', 'Miles Off',
-        'Miles Def', 'Avg Speed', 'Avg Speed Off', 'Avg Speed Def', 'Season',
-        'Player Season',
+        'Miles Def', 'Avg Speed', 'Avg Speed Off', 'Avg Speed Def', 'Extra Possessions'
        ]
 
 app_ui = ui.page_fluid(
     # ui.head_content(ui.include_js("gtag.js",method="inline")),
     ui.card(
-    ui.panel_title("NBA Player Stat Distribution and Trends"),
-        ui.card_footer(ui.markdown("""
+    ui.panel_title(ui.h2("NBA Player Stat Distribution and Trends")),
+        ui.card_footer(ui.h5(ui.markdown("""
                 **By**: [SravanNBA](https://twitter.com/SravanNBA/) | **App views**: {0}
             """.format(connections)
-            )
+            ))
         )
     ),
     ui.card(
         ui.markdown(""" 
-            Plotting Density & Trends for various boxscores stats for a players from 2013-Current.  
-            Choose the **stat**, then **Player 1** and **Season**, and finally **Player 2** and **Season**.  
-            If you want to plot only a Single Player's distribution, select **None** for Player 2.  
+            Plotting Density & Trends for various boxscores stats for a players from **2013-Current**.  
             Higher the Density (probability of the event to occur), the more frequent that event is. You can read more about density plots [here](https://en.wikipedia.org/wiki/Kernel_density_estimation)  
             This app is inspired by my NBA Age Distribution tweets: [1](https://twitter.com/SravanNBA/status/1723550795302617520), [2](https://twitter.com/SravanNBA/status/1729870792534724808)  
             [**Glossary of Stats**](https://www.nba.com/stats/help/glossary)
@@ -108,16 +105,32 @@ app_ui = ui.page_fluid(
         ),
     
     ),
-    ui.row(
-        ui.column(2, ui.input_selectize("var","Stat",vars, selected="Pts")),
-        ui.column(3, ui.input_selectize("player_name1","Player 1",players, selected="LeBron James")),
-        ui.column(1, ui.input_selectize("season1","Season",seasons, selected="2024")),
-        ui.column(3, ui.input_selectize("player_name2","Player 2",players, selected="Giannis Antetokounmpo")),
-        ui.column(1, ui.input_selectize("season2","Season",seasons, selected="2024")),
-
+    ui.layout_sidebar(
+        ui.sidebar(
+            ui.row(
+                ui.column(12, ui.input_selectize("var","Stat",vars, selected="Pts")),
+            ),
+            ui.row(
+                ui.column(8, ui.input_selectize("player_name1","Player 1",players, selected="LeBron James")),
+                ui.column(4, ui.input_selectize("season1","Season",seasons, selected="2024")),
+            ),
+            ui.row(
+                ui.column(8, ui.input_selectize("player_name2","Player 2",players, selected="Giannis Antetokounmpo")),
+                ui.column(4, ui.input_selectize("season2","Season",seasons, selected="2024")),
+            ),
+            ui.row(
+                ui.column(8, ui.input_selectize("player_name3","Player 3",players, selected="None")),
+                ui.column(4, ui.input_selectize("season3","Season",seasons, selected="2024")),
+            ),
+            ui.row(
+                ui.column(8, ui.input_selectize("player_name4","Player 4",players, selected="None")),
+                ui.column(4, ui.input_selectize("season4","Season",seasons, selected="2024")),
+            ),
+            width = 400,
+        ),
+        ui.output_plot("plt", width="800px", height="600px"),
+        ui.output_plot("plt2", width="800px", height="600px"),
     ),
-    ui.output_plot("plt", width="800px", height="600px"),
-    ui.output_plot("plt2", width="800px", height="600px"),
 
 )
 
@@ -125,9 +138,18 @@ def server(input, output, session):
     # ...
     @reactive.Calc
     def filtered_df() -> pd.DataFrame:
-        dff1 = df.query(f'(Player == "{input.player_name1()}" & Season == {input.season1()})')
-        dff2 = df.query(f'(Player == "{input.player_name2()}" & Season == {input.season2()})')
-        dff = pd.concat([dff1,dff2])
+        p1, s1 = input.player_name1(), input.season1()
+        p2, s2 = input.player_name2(), input.season2()
+        p3, s3 = input.player_name3(), input.season3()
+        p4, s4 = input.player_name4(), input.season4()
+        dff1 = df.query(f'(Player == "{p1}" & Season == {s1})')
+        dff2 = df.query(f'(Player == "{p2}" & Season == {s2})')
+        dff3 = df.query(f'(Player == "{p3}" & Season == {s3})')
+        dff4 = df.query(f'(Player == "{p4}" & Season == {s4})')
+        dff = pd.concat([dff1,dff2,dff3,dff4])
+        # dff["Player Season"] = dff["Player Season"].astype("category")
+        # cats = [f"{s1} {p1}", f"{s2} {p2}", f"{s3} {p3}", f"{s4} {p4}"]
+        # dff["Player Season"] = dff["Player Season"].cat.set_categories(cats)
         return dff
     
     @render.data_frame
@@ -135,6 +157,15 @@ def server(input, output, session):
         display_df = filtered_df()
         display_df = display_df.sort_values(by=["Player","Season","Game Date"])
         return render.DataGrid(display_df, filters=False)
+
+    colors = [
+        '#0057e7',
+        '#d62d20',
+        '#008744',
+        '#ffa700',
+        # '#f4522b',
+        '#4d1b7b',
+    ]
     
     @render.plot(alt="Player Stat Distribution")
     def plt():
@@ -142,9 +173,9 @@ def server(input, output, session):
         var = input.var()
         scale_x = []
         kwargs_legend = {"alpha":0.0}
-        if "Pct" in var:
+        if "%" in var:
             scale_x = scale_x_continuous(labels=percent_format())
-            if var == "FT Pct":
+            if var == "FT %":
                 limits = [.50,1.00]
                 scale_x = scale_x_continuous(labels=percent_format(), limits = limits)
         elif var in ["ORtg","DRtg"]:
@@ -162,7 +193,7 @@ def server(input, output, session):
                 aes(x=var,fill="Player Season"),
                 alpha=0.5,
             )
-            + scale_fill_manual(values=["blue","red"])
+            + scale_fill_manual(values=colors)
             + scale_x
             + labs(
                 x=var,
@@ -180,10 +211,11 @@ def server(input, output, session):
             )
             + theme(
                 legend_title=element_blank(),
-                legend_position = [0.82,0.82],
+                legend_position = [0.80,0.78],
                 legend_box_margin=0,
                 legend_background=element_rect(color="grey", size=0.001,**kwargs_legend),
                 legend_box_background = element_blank(),
+                legend_text=element_text(size=13),
             )
             +  guides(fill=guide_legend(ncol=1))
         )
@@ -196,9 +228,9 @@ def server(input, output, session):
         var = input.var()
         scale_y = []
         kwargs_legend = {"alpha":0.0}
-        if "Pct" in var:
+        if "%" in var:
             scale_y = scale_y_continuous(labels=percent_format())
-            if var == "FT Pct":
+            if var == "FT %":
                 limits = [.50,1.00]
                 scale_y = scale_y_continuous(labels=percent_format(), limits = limits)
         elif var in ["ORtg","DRtg"]:
@@ -215,7 +247,7 @@ def server(input, output, session):
             + geom_point()
             + geom_smooth(size=2,se=False,method="lowess",span=0.4)
             # + facet_wrap(facets = "~ Player Season",ncol=1)
-            + scale_color_manual(values=["blue","red"])
+            + scale_color_manual(values=colors)
             + scale_y
             + labs(
                 x="Games Played",
@@ -233,10 +265,11 @@ def server(input, output, session):
             )
             + theme(
                 legend_title=element_blank(),
-                legend_position = [0.32,0.82],
+                legend_position = [0.32,0.78],
                 legend_box_margin=0,
                 legend_background=element_rect(color="grey", size=0.001,**kwargs_legend),
                 legend_box_background = element_blank(),
+                legend_text=element_text(size=13),
             )
             +  guides(color=guide_legend(ncol=1))
         )
