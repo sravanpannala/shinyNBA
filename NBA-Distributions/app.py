@@ -57,33 +57,39 @@ df = pd.read_parquet(data_DIR + "NBA_Player_Distribution.parquet")
 players = list(df["Player"].unique())
 players.append("None")
 seasons = list(df["Season"].astype(str).unique())
-vars = [
-        'Pts', 'Min', 'FGM', 'FGA', 'FG %', 'FG3M', 'FG3A',
-        'FG3 %', 'FTM', 'FTA', 'FT %', 'OReb', 'DReb', 'Reb', 'Ast', 'Stl',
-        'Blk', 'Tov', 'PF' , 'Plus Minus', 'ORtg', 'DRtg', 'NetRtg',
-        'Ast %', 'Ast/Tov', 'Ast Ratio', 'OReb %', 'DReb %', 'Reb %',
-        'Tov Ratio', 'eFG %', 'TS %', 'USG %', 'Pace', 'Poss', 'PIE',
-        'Off Poss', 'Def Poss', 'Drives', 'Drive FGM', 'Drive FGA', 'Drive FTM',
-        'Drive FTA', 'Drive Points', 'Drive Passes', 'Drive Asts', 'Drive Tovs',
-        'Drive Fouls', 'Passes Made', 'Passes Received', 'FT Asts',
-        'Secondary Asts', 'Potential Asts',
-        'Adj Asts', 'Ast Pts', 'Def Rim FGM', 'Def Rim FGA', 'Touches',
-        'Front Court Touches', 'Time Of Poss', 'Seconds Per Touch',
-        'Dribbles Per Touch', 'Elbow Touches', 'Elbow Touch FGM',
-        'Elbow Touch FGA', 'Elbow Touch FTM', 'Elbow Touch FTA',
-        'Elbow Touch Points', 'Elbow Touch Passes', 'Elbow Touch Asts',
-        'Elbow Touch Tovs', 'Elbow Touch Fouls', 'Paint Touches',
-        'Paint Touch FGM', 'Paint Touch FGA', 'Paint Touch FTM',
-        'Paint Touch FTA', 'Paint Touch Points', 'Paint Touch Passes',
-        'Paint Touch Asts', 'Paint Touch Tovs', 'Paint Touch Fouls',
-        'Post Touches',
-        'Post Touch FGM', 'Post Touch FGA', 'Post Touch FTM', 'Post Touch FTA',
-        'Post Touch Points', 'Post Touch Passes', 'Post Touch Asts',
-        'Post Touch Tovs', 'Post Touch Fouls', 'OReb Contest', 'OReb Uncontest',
-        'OReb Chances', 'OReb Chance Defer', 'DReb Contest', 'DReb Uncontest',
-        'DReb Chances', 'DReb Chance Defer', 'Feet', 'Miles', 'Miles Off',
-        'Miles Def', 'Avg Speed', 'Avg Speed Off', 'Avg Speed Def', 'Extra Possessions'
-       ]
+
+basic = [
+    'Pts', 'Min', 'FGM', 'FGA', 'FG %', 'FG3M', 'FG3A',
+    'FG3 %', 'FTM', 'FTA', 'FT %', 'OReb', 'DReb', 'Reb', 'Ast', 'Stl',
+    'Blk', 'Tov', 'PF', 'Plus Minus',
+]
+
+advanced = [
+    'ORtg', 'DRtg', 'NetRtg', 'eFG %', 'TS %',
+]
+
+playmaking = [
+    'Ast %', 'Ast/Tov', 'Ast Ratio','Tov Ratio', 'Passes Made', 'Passes Received',
+    'FT Asts', 'Secondary Asts', 'Potential Asts', 'Potential Asts',
+    'Drive Points', 'Drive Asts', 'Drives',
+]
+
+rebounding = [
+    'OReb %', 'DReb %', 'Reb %','OReb Chances', 'DReb Chances', 'OReb Contest',
+    'DReb Contest',
+]
+
+usage = [
+    'USG %', 'Pace', 'Poss', 'Touches',  'Front Court Touches', 'Time Of Poss',
+    'Seconds Per Touch',
+]
+
+hustle = [
+    'Miles', 'Miles Off', 'Miles Def', 'Avg Speed', 'Avg Speed Off', 'Avg Speed Def',
+    'Extra Possessions',
+]
+
+vars = {"Basic":basic,"Advanced":advanced,"Playmaking":playmaking,"Rebounding":rebounding,"Usage":usage,"Hustle":hustle}
 
 app_ui = ui.page_fluid(
     # ui.head_content(ui.include_js("gtag.js",method="inline")),
@@ -147,9 +153,18 @@ def server(input, output, session):
         dff3 = df.query(f'(Player == "{p3}" & Season == {s3})')
         dff4 = df.query(f'(Player == "{p4}" & Season == {s4})')
         dff = pd.concat([dff1,dff2,dff3,dff4])
-        # dff["Player Season"] = dff["Player Season"].astype("category")
+        dff["Player Season"] = dff["Player Season"].astype("category")
+        cats = []
+        if p1 != "None":
+            cats.append(f"{s1} {p1}")
+        if p2 != "None":
+            cats.append(f"{s2} {p2}")
+        if p3 != "None":
+            cats.append(f"{s3} {p3}")
+        if p4 != "None":
+            cats.append(f"{s4} {p4}")
         # cats = [f"{s1} {p1}", f"{s2} {p2}", f"{s3} {p3}", f"{s4} {p4}"]
-        # dff["Player Season"] = dff["Player Season"].cat.set_categories(cats)
+        dff["Player Season"] = dff["Player Season"].cat.set_categories(cats)
         return dff
     
     @render.data_frame
@@ -199,7 +214,7 @@ def server(input, output, session):
                 x=var,
                 y="Density",
                 title=f"NBA Stat Distribution:  {var}",
-                caption="@SravanNBA | source: nba.com/stats",
+                caption="@SravanNBA",
             )
             + theme_xkcd(base_size=14)
             # + theme_538(base_size=12)
@@ -253,7 +268,7 @@ def server(input, output, session):
                 x="Games Played",
                 y=var,
                 title=f"NBA Stat Trends:  {var}",
-                caption="@SravanNBA | source: nba.com/stats",
+                caption="@SravanNBA",
             )
             + theme_xkcd(base_size=14)
             # + theme_538(base_size=14)
