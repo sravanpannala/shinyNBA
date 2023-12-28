@@ -3,6 +3,7 @@
 *.png
 *.csv
 *.parquet
+*.jpeg
 
 # Folders
 examples/

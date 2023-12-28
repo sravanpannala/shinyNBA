@@ -1,3 +1,4 @@
+from pathlib import Path
 import os
 import numpy as np
 import pandas as pd
@@ -58,43 +59,50 @@ players = list(df["Player"].unique())
 players.append("None")
 seasons = list(df["Season"].astype(str).unique())
 
-basic = [
+basic_a = [
     'Pts', 'Min', 'FGM', 'FGA', 'FG %', 'FG3M', 'FG3A',
     'FG3 %', 'FTM', 'FTA', 'FT %', 'OReb', 'DReb', 'Reb', 'Ast', 'Stl',
     'Blk', 'Tov', 'PF', 'Plus Minus',
 ]
 
-advanced = [
+advanced_a = [
     'ORtg', 'DRtg', 'NetRtg', 'eFG %', 'TS %',
 ]
 
-playmaking = [
+playmaking_a = [
     'Ast %', 'Ast/Tov', 'Ast Ratio','Tov Ratio', 'Passes Made', 'Passes Received',
     'FT Asts', 'Secondary Asts', 'Potential Asts', 'Potential Asts',
     'Drive Points', 'Drive Asts', 'Drives',
 ]
 
-rebounding = [
+rebounding_a = [
     'OReb %', 'DReb %', 'Reb %','OReb Chances', 'DReb Chances', 'OReb Contest',
     'DReb Contest',
 ]
 
-usage = [
+usage_a = [
     'USG %', 'Pace', 'Poss', 'Touches',  'Front Court Touches', 'Time Of Poss',
     'Seconds Per Touch',
 ]
 
-hustle = [
+hustle_a = [
     'Miles', 'Miles Off', 'Miles Def', 'Avg Speed', 'Avg Speed Off', 'Avg Speed Def',
     'Extra Possessions',
 ]
+
+basic = {key: key for key in basic_a}
+advanced = {key: key for key in advanced_a}
+playmaking = {key: key for key in playmaking_a}
+rebounding = {key: key for key in rebounding_a}
+usage = {key: key for key in usage_a}
+hustle = {key: key for key in hustle_a}
 
 vars = {"Basic":basic,"Advanced":advanced,"Playmaking":playmaking,"Rebounding":rebounding,"Usage":usage,"Hustle":hustle}
 
 app_ui = ui.page_fluid(
     # ui.head_content(ui.include_js("gtag.js",method="inline")),
     ui.card(
-    ui.panel_title(ui.h2("NBA Player Stat Distribution and Trends")),
+        ui.panel_title(ui.h2("NBA Player Stat Distribution and Trends")),
         ui.card_footer(ui.h5(ui.markdown("""
                 **By**: [SravanNBA](https://twitter.com/SravanNBA/) | **App views**: {0}
             """.format(connections)
