@@ -57,7 +57,8 @@ df = pd.read_parquet(data_DIR + "NBA_Player_Distribution.parquet")
 
 players = list(df["Player"].unique())
 players.append("None")
-seasons = list(df["Season"].astype(str).unique())
+seasons = (list(map(str,list(set(df["Season"])))))
+seasons.reverse()
 
 basic_a = [
     'Pts', 'Min', 'FGM', 'FGA', 'FG %', 'FG3M', 'FG3A',
@@ -111,8 +112,8 @@ app_ui = ui.page_fluid(
     ),
     ui.card(
         ui.markdown(""" 
-            Plotting Density & Trends for various boxscores stats for a players from **2013-Current**.  
-            In the Density plot, higher the Y value, the more frequent that event is. More information [here](https://en.wikipedia.org/wiki/Kernel_density_estimation)  
+            Plotting Density & Trends for various boxscores stats for a players from **2004-Current**. Tracking Data available only from **2013-**  
+            In the Density plot, the Y value (Frequency), is an indicator of how often the event occurs. More information [here](https://en.wikipedia.org/wiki/Kernel_density_estimation)  
             For the Trends plot, the trend line is a smooth conditional mean. More information [here](https://ggplot2.tidyverse.org/reference/geom_smooth.html)  
             [**Glossary of Stats**](https://www.nba.com/stats/help/glossary)
             """
@@ -171,7 +172,6 @@ def server(input, output, session):
             cats.append(f"{s3} {p3}")
         if p4 != "None":
             cats.append(f"{s4} {p4}")
-        # cats = [f"{s1} {p1}", f"{s2} {p2}", f"{s3} {p3}", f"{s4} {p4}"]
         dff["Player Season"] = dff["Player Season"].cat.set_categories(cats)
         return dff
     
@@ -220,12 +220,11 @@ def server(input, output, session):
             + scale_x
             + labs(
                 x=var,
-                y="Freqency",
+                y="Frequency",
                 title=f"NBA Stat Distribution:  {var}",
                 caption="@SravanNBA",
             )
             + theme_xkcd(base_size=14)
-            # + theme_538(base_size=12)
             + theme(
                 plot_title=element_text(face="bold", size=22),
                 plot_subtitle=element_text(size=14),
@@ -234,11 +233,11 @@ def server(input, output, session):
             )
             + theme(
                 legend_title=element_blank(),
-                legend_position = [0.80,0.78],
+                legend_position = [0.82,0.78],
                 legend_box_margin=0,
                 legend_background=element_rect(color="grey", size=0.001,**kwargs_legend),
                 legend_box_background = element_blank(),
-                legend_text=element_text(size=13),
+                legend_text=element_text(size=12),
             )
             +  guides(fill=guide_legend(ncol=1))
         )
@@ -288,11 +287,11 @@ def server(input, output, session):
             )
             + theme(
                 legend_title=element_blank(),
-                legend_position = [0.32,0.78],
+                legend_position = [0.82,0.78],
                 legend_box_margin=0,
                 legend_background=element_rect(color="grey", size=0.001,**kwargs_legend),
                 legend_box_background = element_blank(),
-                legend_text=element_text(size=13),
+                legend_text=element_text(size=12),
             )
             +  guides(color=guide_legend(ncol=1))
         )
