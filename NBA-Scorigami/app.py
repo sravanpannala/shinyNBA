@@ -112,7 +112,7 @@ def server(input, output, session):
             + labs(
                 title = player + ": Box Scorigami",
                 subtitle = f"# NBA Games with different combinations of\n  {var1} & {var2}",
-                caption = "@SravanNBA",
+                caption = "@SravanNBA\nshiny.sradjoker.cc/NBA-Scorigami",
                 x = var1,
                 y = var2,
             )
