@@ -52,7 +52,7 @@ app_ui = ui.page_fluid(
     # ui.head_content(ui.include_js("gtag.js",method="inline")),
     ui.card(
         ui.panel_title(ui.h1("NBA Box Scorigami")),
-        ui.card_footer(ui.h5(ui.markdown("""
+        ui.card_footer(ui.h6(ui.markdown("""
                 **By**: [SravanNBA](https://twitter.com/SravanNBA/) | **App views**: {0}
             """.format(connections)
             ))
@@ -61,7 +61,7 @@ app_ui = ui.page_fluid(
     ui.card(
         ui.markdown(""" 
             Heavily inpsired by [Todd Whitehead's](https://twitter.com/CrumpledJumper) [Box Scorigami](https://x.com/CrumpledJumper/status/1740251518840996135?s=20) of Kevin Durant.  
-            Data available only from **1996-97** onwards | Data **updated daily**  
+            Includes **Regular Season** & **Playoffs** | Data available only from **1996-97** onwards | Data **updated daily**  
             """
         ), 
     ),
@@ -111,7 +111,7 @@ def server(input, output, session):
             + scale_fill_gradient(low = "#f2f2f2", high = "red")
             + labs(
                 title = player + ": Box Scorigami",
-                subtitle = f"# Regular Season Games with different combinations of\n{var1} & {var2}",
+                subtitle = f"# NBA Games with different combinations of\n  {var1} & {var2}",
                 caption = "@SravanNBA",
                 x = var1,
                 y = var2,
