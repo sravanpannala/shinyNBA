@@ -6,7 +6,6 @@ from plotnine import aes, scale_fill_gradient, theme, element_blank,element_text
 
 pd.options.mode.chained_assignment =  None
 
-
 from shiny import App, ui, render, reactive
 
 logs_DIR = "/var/log/shiny-server/"
@@ -32,7 +31,7 @@ data_DIR = "/var/data/shiny/"
 df = pd.read_parquet(data_DIR + "NBA_Player_Scorigami.parquet")
 
 players = list(df["Player"].unique())
-vars = ["Points", "Assists", "Rebounds", "Steals", "Blocks","Turnovers", "3-Pointers Made", "Free Throws Made"]
+vars = ["Points", "Assists", "Rebounds", "Steals", "Blocks","Turnovers", "3Pt Shots Made", "Free Throws Made"]
 
 def get_cat(var):
     var_cat = ""
@@ -51,7 +50,7 @@ def get_cat(var):
     elif var == "3Pt Shots Made":
         var_cat = "Fg3M_cat"
     elif var == "Free Throws Made":
-        var_cat = "Fta_cat"
+        var_cat = "Ftm_cat"
     return var_cat
 
 app_ui = ui.page_fluid(
@@ -132,7 +131,7 @@ def server(input, output, session):
             + theme(
                 plot_background = element_rect(fill = 'white', color = "white"),
                 legend_position="none",
-                plot_title=element_text(face="bold", size=20),
+                plot_title=element_text(face="bold", size=18),
                 plot_subtitle=element_text(size=13),
                 plot_caption=element_text(hjust=0),
                 figure_size= (6,6),
