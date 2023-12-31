@@ -32,7 +32,7 @@ data_DIR = "/var/data/shiny/"
 df = pd.read_parquet(data_DIR + "NBA_Player_Scorigami.parquet")
 
 players = list(df["Player"].unique())
-vars = ["Points", "Assists", "Rebounds", "Steals", "Blocks","Turnovers"]
+vars = ["Points", "Assists", "Rebounds", "Steals", "Blocks","Turnovers", "3-Pointers Made", "Free Throws Made"]
 
 def get_cat(var):
     var_cat = ""
@@ -48,6 +48,10 @@ def get_cat(var):
         var_cat = "Blk_cat"
     elif var == "Turnovers":
         var_cat = "Tov_cat"
+    elif var == "3Pt Shots Made":
+        var_cat = "Fg3M_cat"
+    elif var == "Free Throws Made":
+        var_cat = "Fta_cat"
     return var_cat
 
 app_ui = ui.page_fluid(
