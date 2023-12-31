@@ -106,7 +106,7 @@ app_ui = ui.page_fluid(
         ui.panel_title(ui.h2("NBA Player Stat Distribution and Trends")),
         ui.card_footer(ui.h5(ui.markdown("""
                 **By**: [SravanNBA](https://twitter.com/SravanNBA/) | **App views**: {0}
-            """.format(connections)
+            """.format(ui.output_text("views",inline=True))
             ))
         )
     ),
@@ -150,7 +150,12 @@ app_ui = ui.page_fluid(
 )
 
 def server(input, output, session):
-    # ...
+
+    @render.text
+    def views():
+        txt = str(get_viewcount())
+        return txt
+
     @reactive.Calc
     def filtered_df() -> pd.DataFrame:
         p1, s1 = input.player_name1(), input.season1()

@@ -32,7 +32,7 @@ data_DIR = "/var/data/shiny/"
 df = pd.read_parquet(data_DIR + "NBA_Player_Scorigami.parquet")
 
 players = list(df["Player"].unique())
-vars = ["Points", "Assists", "Rebounds", "Steals", "Blocks"]
+vars = ["Points", "Assists", "Rebounds", "Steals", "Blocks","Turnovers"]
 
 def get_cat(var):
     var_cat = ""
@@ -46,6 +46,8 @@ def get_cat(var):
         var_cat = "Stl_cat"
     elif var == "Blocks":
         var_cat = "Blk_cat"
+    elif var == "Turnovers":
+        var_cat = "Tov_cat"
     return var_cat
 
 app_ui = ui.page_fluid(
@@ -54,7 +56,7 @@ app_ui = ui.page_fluid(
         ui.panel_title(ui.h1("NBA Box Scorigami")),
         ui.card_footer(ui.h6(ui.markdown("""
                 **By**: [SravanNBA](https://twitter.com/SravanNBA/) | **App views**: {0}
-            """.format(connections)
+            """.format(ui.output_text("views",inline=True))
             ))
         )
     ),
@@ -82,6 +84,12 @@ app_ui = ui.page_fluid(
 )
 
 def server(input, output, session):
+
+    @render.text
+    def views():
+        txt = str(get_viewcount())
+        return txt
+
     @reactive.Calc
     def filtered_df() -> pd.DataFrame:
         player = input.player()

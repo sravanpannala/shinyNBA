@@ -4,6 +4,7 @@
 *.csv
 *.parquet
 *.jpeg
+restart.txt
 
 # Folders
 examples/

@@ -39,7 +39,7 @@ questions = [
     "How often do you have the ball in your hands?",
     "How willing/active of a passer are you?",
     "How versatile of a passer are you?",
-    "How turnover prone are you?",
+    "How turnover prone are you? (0: alot 100: not much)",
     "How much do you contribute to your team's offense overall?",
     "How often do you guard the other team's best player(s)?",
     "How good is your perimeter defense on the ball?",
@@ -55,12 +55,12 @@ questions = [
 app_ui = ui.page_fluid(
     # ui.head_content(ui.include_js("gtag.js",method="inline")),
     ui.card(
-    ui.panel_title("NBA Pickup Comparision Finder v3.0"),
+    ui.panel_title("NBA Pickup Comparison Finder v3.0"),
         ui.card_footer(ui.markdown("""
                 **Data and Idea**: [automaticnba](https://twitter.com/automaticnba/) | 
                 **Application**: [SravanNBA](https://twitter.com/SravanNBA/) | 
                 **App Views**: {0}
-            """.format(connections)
+            """.format(ui.output_text("views",inline=True))
             )
         )
     ),
@@ -134,6 +134,12 @@ app_ui = ui.page_fluid(
 
 
 def server(input, output, session):
+
+    @render.text
+    def views():
+        txt = str(get_viewcount())
+        return txt
+    
     @reactive.Calc
     def filtered_df() -> pd.DataFrame:
         inputs = [
