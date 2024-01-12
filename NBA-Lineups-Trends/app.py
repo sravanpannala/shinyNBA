@@ -150,7 +150,7 @@ def get_game_logs(lineup):
 app_ui = ui.page_fluid(
     # ui.head_content(ui.include_js("gtag.js",method="inline")),
     ui.card(
-        ui.panel_title(ui.h1("NBA Lineups Trends App")),
+        ui.panel_title(ui.h1("NBA Lineups Trends")),
         ui.card_footer(ui.h6(ui.markdown("""
                 **By**: [SravanNBA](https://twitter.com/SravanNBA/) | **Idea**: [Shamit Dua](https://twitter.com/FearTheBrown) | **App views**: {0}
             """.format(ui.output_text("views",inline=True))
@@ -217,13 +217,15 @@ def server(input, output, session):
             var = input.stat()
             stype = input.stype()
             if stype == "Per 100 Possessions":
-                no_mod = ['PerPoss','Accuracy','Pct','TotalPoss','ShotQualityAvg','Pace',]
+                no_mod = ['PerPoss','Frequency','Accuracy','Pct','TotalPoss','ShotQualityAvg','Pace',]
                 if any(c in var for c in no_mod):
                     df1[var] = df1[var]
                 else:
                     df1[var] = df1[var]/df1["TotalPoss"]*100
+            else:
+                df1[var] = df1[var]
             scale_y = []
-            if "Pct" in var or "Accuracy" in var:
+            if "Pct" in var or "Accuracy" in var or "Frequency" in var:
                 scale_y = scale_y_continuous(labels=percent_format())
             plot = (
                 ggplot(df1,aes(x="Date",y=var))  
