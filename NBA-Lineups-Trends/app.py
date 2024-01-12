@@ -27,6 +27,7 @@ from plotnine import (
     geom_line,
     geom_hline,
     scale_x_datetime,
+    scale_y_datetime,
     # facet_wrap,
 )
 from mizani.formatters import percent_format
@@ -207,6 +208,7 @@ def server(input, output, session):
         lineup = s[:-1]
         lineup_data, totals = get_game_logs(lineup)
         lineup_data["Date"] = pd.to_datetime(lineup_data["Date"], format="%Y-%m-%d")
+        lineup_data["Minutes"] = pd.to_datetime(lineup_data["Minutes"], format="%M:%S")
         return lineup_data, totals
     
 
@@ -215,20 +217,23 @@ def server(input, output, session):
         try:
             df1,totals = get_lineup_data()
             var = input.stat()
+            var1 = var + "1"
             stype = input.stype()
             if stype == "Per 100 Possessions":
-                no_mod = ['PerPoss','Frequency','Accuracy','Pct','TotalPoss','ShotQualityAvg','Pace',]
+                no_mod = ['PerPoss','Frequency','Accuracy','Pct','TotalPoss','ShotQualityAvg','Pace','Minutes']
                 if any(c in var for c in no_mod):
-                    df1[var] = df1[var]
+                    df1[var1] = df1[var]
                 else:
-                    df1[var] = df1[var]/df1["TotalPoss"]*100
+                    df1[var1] = df1[var]/df1["TotalPoss"]*100
             else:
-                df1[var] = df1[var]
+                df1[var1] = df1[var]
             scale_y = []
             if "Pct" in var or "Accuracy" in var or "Frequency" in var:
                 scale_y = scale_y_continuous(labels=percent_format())
+            elif "Minutes" in var:
+                scale_y = scale_y_datetime(date_labels = "%M:%S")
             plot = (
-                ggplot(df1,aes(x="Date",y=var))  
+                ggplot(df1,aes(x="Date",y=var1))  
                 + geom_point(alpha=0.8)
                 + geom_smooth(size=1.5, se=False, method="lowess", span=0.5, alpha=0.5)
                 # + geom_hline(yintercept = totals[var])
