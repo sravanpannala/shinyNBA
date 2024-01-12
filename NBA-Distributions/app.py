@@ -1,5 +1,5 @@
 from pathlib import Path
-import os
+import os, time
 import numpy as np
 import pandas as pd
 from plotnine.ggplot import ggplot
@@ -22,6 +22,7 @@ from plotnine import (
     geom_point,
     geom_smooth,
     scale_color_manual,
+    geom_line,
     # facet_wrap,
 )
 from mizani.formatters import percent_format
@@ -46,14 +47,16 @@ def get_viewcount():
     return connections
 
 # Testing
-# connections = "100"
-# data_DIR = "C:\\Users\\pansr\\Documents\\shinyNBA\\data\\"
+connections = "100"
+data_DIR = "C:\\Users\\pansr\\Documents\\shinyNBA\\data\\"
 
 # Deployment
-connections = str(get_viewcount())
-data_DIR = "/var/data/shiny/"
+# connections = str(get_viewcount())
+# data_DIR = "/var/data/shiny/"
 
-df = pd.read_parquet(data_DIR + "NBA_Player_Distribution.parquet")
+filepath = data_DIR + "NBA_Player_Distribution.parquet"
+date_updated = time.ctime(os.path.getmtime(filepath))
+df = pd.read_parquet(filepath)
 
 players = list(df["Player"].unique())
 players.append("None")
@@ -105,8 +108,8 @@ app_ui = ui.page_fluid(
     ui.card(
         ui.panel_title(ui.h2("NBA Player Stat Distribution and Trends")),
         ui.card_footer(ui.h5(ui.markdown("""
-                **By**: [SravanNBA](https://twitter.com/SravanNBA/) | **App views**: {0}
-            """.format(ui.output_text("views",inline=True))
+                **By**: [SravanNBA](https://twitter.com/SravanNBA/) | **App views**: {0} | Updated on **{1}**
+            """.format(ui.output_text("views",inline=True),date_updated)
             ))
         )
     ),
@@ -142,19 +145,20 @@ app_ui = ui.page_fluid(
                 ui.column(4, ui.input_selectize("season4","Season",seasons, selected="2024")),
             ),
             width = 400,
+            open="open",
         ),
-        ui.output_plot("plt", width="800px", height="600px"),
-        ui.output_plot("plt2", width="800px", height="600px"),
+        ui.output_plot("plt",  width="600px", height="600px"),
+        ui.output_plot("plt2", width="600px", height="600px"),
     ),
 
 )
 
 def server(input, output, session):
 
-    @render.text
-    def views():
-        txt = str(get_viewcount())
-        return txt
+    # @render.text
+    # def views():
+    #     txt = str(get_viewcount())
+    #     return txt
 
     @reactive.Calc
     def filtered_df() -> pd.DataFrame:
@@ -195,7 +199,7 @@ def server(input, output, session):
         '#4d1b7b',
     ]
     
-    @render.plot(alt="Player Stat Distribution")
+    @render.plot(alt="Stat Distribution")
     def plt():
         df1 = filtered_df()
         var = input.var()
@@ -209,7 +213,6 @@ def server(input, output, session):
         elif var in ["ORtg","DRtg"]:
             x_breaks = np.arange(90,140,5)
             x_labels = list(x_breaks.astype(str))
-            # scale_x = scale_x_continuous(breaks=x_breaks, labels= x_labels, limits = [x_breaks[0],x_breaks[-1]])
             scale_x = scale_x_continuous(limits = [x_breaks[0],x_breaks[-1]])
         elif var in ["NRtg"]:
             x_breaks = np.arange(-25,25,5)
@@ -226,30 +229,30 @@ def server(input, output, session):
             + labs(
                 x=var,
                 y="Frequency",
-                title=f"NBA Stat Distribution:  {var}",
+                title=f"Stat Distribution:  {var}",
                 caption="@SravanNBA",
             )
-            + theme_xkcd(base_size=14)
+            + theme_xkcd(base_size=16)
             + theme(
-                plot_title=element_text(face="bold", size=22),
-                plot_subtitle=element_text(size=14),
+                plot_title=element_text(face="bold", size=20),
                 plot_margin=0.025,
-                figure_size=[8,6]
+                figure_size=[6,6]
             )
             + theme(
                 legend_title=element_blank(),
-                legend_position = [0.82,0.78],
+                # legend_position = [0.80,0.78],
+                legend_position="bottom",
                 legend_box_margin=0,
                 legend_background=element_rect(color="grey", size=0.001,**kwargs_legend),
                 legend_box_background = element_blank(),
-                legend_text=element_text(size=12),
+                legend_text=element_text(size=11),
             )
-            +  guides(fill=guide_legend(ncol=1))
+            +  guides(fill=guide_legend(ncol=2))
         )
     
         return plot
 
-    @render.plot(alt="Player Stat Mean")
+    @render.plot(alt="Stat Trends")
     def plt2():
         df1 = filtered_df()
         var = input.var()
@@ -263,42 +266,41 @@ def server(input, output, session):
         elif var in ["ORtg","DRtg"]:
             x_breaks = np.arange(90,140,5)
             x_labels = list(x_breaks.astype(str))
-            # scale_y = scale_y_continuous(breaks=x_breaks, labels= x_labels, limits = [x_breaks[0],x_breaks[-1]])
             scale_y = scale_y_continuous(limits = [x_breaks[0],x_breaks[-1]])
         elif var in ["NRtg"]:
             x_breaks = np.arange(-25,25,5)
             x_labels = list(x_breaks.astype(str))
             scale_y = scale_y_continuous(breaks=x_breaks, labels= x_labels, limits = [x_breaks[0],x_breaks[-1]])
         plot = (
-            ggplot(df1,aes(x="Games Played",y=var,color="Player Season"))  
-            + geom_point()
-            + geom_smooth(size=2,se=False,method="lowess",span=0.4)
-            # + facet_wrap(facets = "~ Player Season",ncol=1)
+            ggplot(df1,aes(x="Games Played",y=var,color="Player Season", shape="Player Season"))  
+            + geom_point(alpha=0.8)
+            + geom_smooth(size=1.5, se=False, method="lowess", span=0.5, alpha=0.5)
+            # + geom_smooth(size=1.5, se=False, method="mavg", method_args={"window":5, "min_periods":0})
+            # + geom_line()
             + scale_color_manual(values=colors)
             + scale_y
             + labs(
                 x="Games Played",
                 y=var,
-                title=f"NBA Stat Trends:  {var}",
+                title=f"Stat Trends:  {var}",
                 caption="@SravanNBA",
             )
-            + theme_xkcd(base_size=14)
-            # + theme_538(base_size=14)
+            + theme_xkcd(base_size=16)
             + theme(
-                plot_title=element_text(face="bold", size=22),
-                plot_subtitle=element_text(size=14),
+                plot_title=element_text(face="bold", size=20),
                 plot_margin=0.025,
-                figure_size=[8,6]
+                figure_size=[6,6]
             )
             + theme(
                 legend_title=element_blank(),
-                legend_position = [0.82,0.78],
+                # legend_position = [0.80,0.78],
+                legend_position="bottom",
                 legend_box_margin=0,
                 legend_background=element_rect(color="grey", size=0.001,**kwargs_legend),
                 legend_box_background = element_blank(),
-                legend_text=element_text(size=12),
+                legend_text=element_text(size=11),
             )
-            +  guides(color=guide_legend(ncol=1))
+            +  guides(color=guide_legend(ncol=2))
         )
     
         return plot  
