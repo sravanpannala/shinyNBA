@@ -285,7 +285,7 @@ def server(input, output, session):
                         + "Total Possessions Played: " + str(totals["Poss"]) + " | " 
                         + "Total Minutes Played: " + str(totals["Minutes"]) 
                     ),
-                    caption="@SravanNBA | @FearTheBrown | Powered by api.pbpbstats.com\nshiny.sradjoker.cc/NBA-Lineups-Trends",
+                    caption="@SravanNBA | @FearTheBrown | Powered by api.pbpstats.com\nshiny.sradjoker.cc/NBA-Lineups-Trends",
                 )
                 + theme_xkcd(base_size=16)
                 + theme(
