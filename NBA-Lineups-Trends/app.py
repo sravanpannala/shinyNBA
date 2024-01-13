@@ -277,7 +277,7 @@ def server(input, output, session):
                 + scale_y
                 + labs(
                     x="Date",
-                    y=var,
+                    y=var + " " + f"({stype})",
                     title=f"Lineup Stat Trends: {var}",
                     subtitle= (
                         totals['Name'] + "\n"
