@@ -1,5 +1,5 @@
 from pathlib import Path
-import os, time
+import os, time, sys
 import numpy as np
 import pandas as pd
 from plotnine.ggplot import ggplot
@@ -31,7 +31,6 @@ from mizani.formatters import percent_format
 # import shutil
 # shutil.rmtree(mpl.get_cachedir())
 
-
 from shiny import App, ui, render, reactive
 
 logs_DIR = "/var/log/shiny-server/"
@@ -46,13 +45,12 @@ def get_viewcount():
         connections += log_text.count("open")
     return connections
 
+if sys.platform == "win32":
 # Testing
-# connections = "100"
-# data_DIR = "C:\\Users\\pansr\\Documents\\shinyNBA\\data\\"
-
+    data_DIR = "C:\\Users\\pansr\\Documents\\shinyNBA\\data\\"
+else:
 # Deployment
-connections = str(get_viewcount())
-data_DIR = "/var/data/shiny/"
+    data_DIR = "/var/data/shiny/"
 
 filepath = data_DIR + "NBA_Player_Distribution.parquet"
 date_updated = time.ctime(os.path.getmtime(filepath))
@@ -155,10 +153,10 @@ app_ui = ui.page_fluid(
 
 def server(input, output, session):
 
-    # @render.text
-    # def views():
-    #     txt = str(get_viewcount())
-    #     return txt
+    @render.text
+    def views():
+        txt = str(get_viewcount())
+        return txt
 
     @reactive.Calc
     def filtered_df() -> pd.DataFrame:
