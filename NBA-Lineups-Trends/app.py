@@ -168,7 +168,7 @@ app_ui = ui.page_fluid(
         ui.column(3,ui.input_selectize("stype","Stat Type",["Totals","Per 100 Possessions"],selected="Totals",multiple=False)),
     ),
     ui.card(
-        ui.output_plot("plot",  width="800px", height="700px"),
+        ui.output_plot("plot",  width="900px", height="700px"),
     ),
 )
 
@@ -281,7 +281,7 @@ def server(input, output, session):
                     plot_title=element_text(face="bold", size=20),
                     plot_subtitle=element_text(size=12),
                     plot_margin=0.025,
-                    figure_size=[8,6]
+                    figure_size=[9,7]
                 )
                 + theme(
                     legend_title=element_blank(),
@@ -295,7 +295,7 @@ def server(input, output, session):
                 + guides(color=guide_legend(ncol=2))
             )
         except:
-            plot, ax = plt.subplots(1,1,figsize=(8,7))  
+            plot, ax = plt.subplots(1,1,figsize=(9,7))  
             ax.text(0.1, 0.85,'Error: Please select exactly 5 players',horizontalalignment='left',verticalalignment='center',transform = ax.transAxes, fontsize=20)
 
         return plot  
