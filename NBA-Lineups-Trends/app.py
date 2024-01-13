@@ -218,10 +218,14 @@ def server(input, output, session):
             var1 = var + "1"
             stype = input.stype()
             if stype == "Per 100 Possessions":
-                no_mod = ['PerPoss','Frequency','Accuracy','Pct','Poss','ShotQualityAvg','Pace','Minutes']
+                no_mod = ['PerPoss','Frequency','Accuracy','Pct','Poss','ShotQualityAvg','Pace']
                 if any(c in var for c in no_mod):
                     df1[var1] = df1[var]
                     y_int = totals[var]
+                elif "Minutes" in var:
+                    df1[var1] = df1[var]
+                    td = dt.timedelta(minutes=totals[var]/len(df1[var]))
+                    y_int = pd.to_datetime(td, format="%H:%M:%S") # type: ignore
                 else:
                     df1[var1] = df1[var]/df1["Poss"]*100
                     y_int = totals[var]/totals["Poss"]*100
