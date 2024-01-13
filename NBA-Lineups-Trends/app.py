@@ -224,7 +224,8 @@ def server(input, output, session):
                     y_int = totals[var]
                 elif "Minutes" in var:
                     df1[var1] = df1[var]
-                    td = dt.timedelta(minutes=totals[var]/len(df1[var]))
+                    tot_secs = round(totals[var]*60/len(df1[var]))
+                    td = dt.timedelta(seconds=tot_secs)
                     y_int = pd.to_datetime(td, format="%H:%M:%S") # type: ignore
                 else:
                     df1[var1] = df1[var]/df1["Poss"]*100
@@ -236,7 +237,8 @@ def server(input, output, session):
                 if any(c in var for c in no_mod):
                     y_int = totals[var]
                 elif "Minutes" in var:
-                    td = dt.timedelta(minutes=totals[var]/len(df1[var]))
+                    tot_secs = round(totals[var]*60/len(df1[var]))
+                    td = dt.timedelta(seconds=tot_secs)
                     y_int = pd.to_datetime(td, format="%H:%M:%S") # type: ignore
             scale_y = []
             if "Pct" in var or "Accuracy" in var or "Frequency" in var:
@@ -252,7 +254,6 @@ def server(input, output, session):
                 + scale_x_datetime(date_labels="%b-%d", date_breaks="2 week")
                 + scale_color_manual(name="Trendline", values=["red","black"])
                 + scale_y
-                # + annotate("text", x=0.80, y=0.78, label=stype)
                 + labs(
                     x="Date",
                     y=var,
@@ -273,17 +274,16 @@ def server(input, output, session):
                 + theme(
                     legend_title=element_blank(),
                     legend_position = [0.78,0.80],
-                    # legend_position="bottom",
                     legend_box_margin=0,
                     legend_background=element_rect(color="grey", size=0.001,**kwargs_legend), # type: ignore
                     legend_box_background = element_blank(),
                     legend_text=element_text(size=11),
                 )
-                # + guides(color=guide_legend(ncol=2))
             )
         except:
             plot, ax = plt.subplots(1,1,figsize=(8,6))  
             ax.text(0.1, 0.85,'Error: Please select exactly 5 players',horizontalalignment='left',verticalalignment='center',transform = ax.transAxes, fontsize=20)
+
         return plot  
     
 app = App(app_ui, server)
