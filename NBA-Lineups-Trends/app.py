@@ -218,7 +218,7 @@ def server(input, output, session):
         lineup = s[:-1]
         # print(lineup)
         lineup_data, totals = get_game_logs(lineup)
-        print(len(lineup_data))
+        # print(len(lineup_data))
         if len(lineup_data)<2:
             raise Exception("Error: This Lineup hasn't played any minutes\nthis season, choose another lineup")
         lineup_data["Date"] = pd.to_datetime(lineup_data["Date"], format="%Y-%m-%d")
@@ -285,12 +285,13 @@ def server(input, output, session):
                         + "Total Possessions Played: " + str(totals["Poss"]) + " | " 
                         + "Total Minutes Played: " + str(totals["Minutes"]) 
                     ),
-                    caption="@SravanNBA | @FearTheBrown",
+                    caption="@SravanNBA | @FearTheBrown | Powered by api.pbpbstats.com\nshiny.sradjoker.cc/NBA-Lineups-Trends",
                 )
                 + theme_xkcd(base_size=16)
                 + theme(
                     plot_title=element_text(face="bold", size=20),
                     plot_subtitle=element_text(size=12),
+                    plot_caption=element_text(ha="left"),
                     plot_margin=0.025,
                     figure_size=[9,7]
                 )
