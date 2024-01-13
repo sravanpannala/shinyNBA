@@ -55,11 +55,12 @@ else:
 df = pd.read_parquet(data_DIR + "lineup_data.parquet")
 teams_list = list(df["team"].unique())
 
-dff = df.query(f'team == "BOS"')
+dff = df.query(f'team == "NOP"')
 dff_t = dff[["pid","player"]]
 dff_t = dff_t.set_index("pid")
 player_dict = dff_t.to_dict('dict')['player']
-init_players = ['1627759','1628369','1628401','201950','204001']
+
+init_players = ['1627742','1629627','1630529','202685','203468']
 
 basic_a = [
     'PlusMinus',
@@ -161,13 +162,13 @@ app_ui = ui.page_fluid(
         ), 
     ),
     ui.row(
-        ui.column(3,ui.input_selectize("team","Team",teams_list,selected="BOS")),
+        ui.column(3,ui.input_selectize("team","Team",teams_list,selected="NOP")),
         ui.column(9,ui.input_selectize("players","Lineup (Select Exactly 5 players)",player_dict, selected=init_players,multiple=True, width="70%")),
     ),
     ui.row(
         ui.column(3,ui.input_selectize("stat","Stat",stats,multiple=False)),
         ui.column(3,ui.input_selectize("stype","Stat Type",["Totals","Per 100 Possessions"],selected="Totals",multiple=False)),
-        ui.column(5,ui.input_action_button("go", "Go!", class_="btn-success"),)
+        ui.column(3,ui.input_action_button("go", "Go!", class_="btn-success",width="70%"),)
     ),
     ui.card(
         ui.output_plot("plot",  width="900px", height="700px"),
@@ -206,6 +207,8 @@ def server(input, output, session):
     def get_lineup_data() -> tuple[pd.DataFrame, dict]:   
         player_dict = get_player_dict()
         lineup_in = list(input.players())
+        if len(lineup_in)!=5:
+            raise Exception("Error: Please select exactly 5 players")
         # lineup_names = [player_dict[ll] for ll in lineup_in]
         lineup_in.sort()
         s = ""
@@ -213,7 +216,11 @@ def server(input, output, session):
             s += ll
             s += "-"
         lineup = s[:-1]
+        # print(lineup)
         lineup_data, totals = get_game_logs(lineup)
+        print(len(lineup_data))
+        if len(lineup_data)<2:
+            raise Exception("Error: This Lineup hasn't played any minutes\nthis season, choose another lineup")
         lineup_data["Date"] = pd.to_datetime(lineup_data["Date"], format="%Y-%m-%d")
         lineup_data["Minutes"] = pd.to_datetime(lineup_data["Minutes"], format="%M:%S")
         lineup_data["Poss"] = lineup_data["OffPoss"]
@@ -263,10 +270,10 @@ def server(input, output, session):
             fig = (
                 ggplot(df1,aes(x="Date",y=var1, color="TrendLine"))  
                 + geom_point(fill="white",stroke=1.2)
-                + geom_smooth(size=1.5, se=False, method="lowess", span=0.5, alpha=0.5)
+                + geom_smooth(size=1.5, se=False, method="lowess", span=0.5)
                 + geom_hline(aes(color="AvgLine",yintercept = y_int), linetype='dashed', show_legend=True)
                 + scale_x_datetime(date_labels="%b-%d", date_breaks="2 week")
-                + scale_color_manual(name="Trendline", values=["red","black"])
+                + scale_color_manual(name="Trendline", values=["orangered","black"])
                 + scale_y
                 + labs(
                     x="Date",
@@ -298,9 +305,9 @@ def server(input, output, session):
                 )
                 + guides(color=guide_legend(ncol=2))
             )
-        except:
+        except Exception as error:
             fig, ax = plt.subplots(1,1,figsize=(9,7))  
-            ax.text(0.1, 0.85,'Error: Please select exactly 5 players',horizontalalignment='left',verticalalignment='center',transform = ax.transAxes, fontsize=20)
+            ax.text(0.1, 0.85,str(error),horizontalalignment='left',verticalalignment='center',transform = ax.transAxes, fontsize=18)
 
         return fig  
     
