@@ -239,7 +239,7 @@ def server(input, output, session):
             var1 = var + "1"
             stype = input.stype()
             if stype == "Per 100 Possessions":
-                no_mod = ['PerPoss','Frequency','Accuracy','Pct','Poss','ShotQualityAvg','Pace']
+                no_mod = ['PerPoss','Frequency','Accuracy','Pct','ShotQualityAvg','Pace']
                 if any(c in var for c in no_mod):
                     df1[var1] = df1[var]
                     y_int = totals[var]
