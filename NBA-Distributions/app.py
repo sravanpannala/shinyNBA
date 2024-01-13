@@ -243,7 +243,7 @@ def server(input, output, session):
                 # legend_position = [0.80,0.78],
                 legend_position="bottom",
                 legend_box_margin=0,
-                legend_background=element_rect(color="grey", size=0.001,**kwargs_legend),
+                legend_background=element_rect(color="grey", size=0.001,**kwargs_legend), # type: ignore
                 legend_box_background = element_blank(),
                 legend_text=element_text(size=11),
             )
@@ -296,11 +296,11 @@ def server(input, output, session):
                 # legend_position = [0.80,0.78],
                 legend_position="bottom",
                 legend_box_margin=0,
-                legend_background=element_rect(color="grey", size=0.001,**kwargs_legend),
+                legend_background=element_rect(color="grey", size=0.001,**kwargs_legend), # type: ignore
                 legend_box_background = element_blank(),
                 legend_text=element_text(size=11),
             )
-            +  guides(color=guide_legend(ncol=2))
+            + guides(color=guide_legend(ncol=2))
         )
     
         return plot  

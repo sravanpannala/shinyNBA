@@ -1,6 +1,7 @@
 import os
 import json
 import requests
+import datetime as dt
 import numpy as np
 import pandas as pd
 import matplotlib.pyplot as plt
@@ -8,27 +9,20 @@ from plotnine.ggplot import ggplot
 from plotnine import (
     aes,
     labs,
-    geom_density,
     theme,
     theme_xkcd,
-    # theme_538,
-    guide_legend,
     guides,
     element_text,
     element_blank,
     element_rect,
-    scale_fill_manual,
-    scale_x_continuous,
-    # scale_x_discrete,
     scale_y_continuous,
     geom_point,
     geom_smooth,
     scale_color_manual,
-    geom_line,
     geom_hline,
     scale_x_datetime,
     scale_y_datetime,
-    # facet_wrap,
+    annotate,
 )
 from mizani.formatters import percent_format
 
@@ -50,12 +44,12 @@ def get_viewcount():
     return connections
 
 # Testing
-# connections = "100"
-# data_DIR = "C:\\Users\\pansr\\Documents\\shinyNBA\\data\\"
+connections = "100"
+data_DIR = "C:\\Users\\pansr\\Documents\\shinyNBA\\data\\"
 
 # Deployment
-connections = str(get_viewcount())
-data_DIR = "/var/data/shiny/"
+# connections = str(get_viewcount())
+# data_DIR = "/var/data/shiny/"
 
 df = pd.read_parquet(data_DIR + "lineup_data.parquet")
 teams_list = list(df["team"].unique())
@@ -71,7 +65,7 @@ basic_a = [
     'TsPct',
     'EfgPct',
     'Minutes',
-    'TotalPoss',
+    'Poss',
     'ShotQualityAvg',
     'Points',
     'Pace',
@@ -160,7 +154,7 @@ app_ui = ui.page_fluid(
     ),
     ui.card(
         ui.markdown(""" 
-            Plots Lineup stats for 2023-24 Regular Season  
+            Plots Lineup stats for 2023-24 Regular Season. Powered by [PBP Stats API](https://api.pbpstats.com/docs). 
             """
         ), 
     ),
@@ -209,6 +203,8 @@ def server(input, output, session):
         lineup_data, totals = get_game_logs(lineup)
         lineup_data["Date"] = pd.to_datetime(lineup_data["Date"], format="%Y-%m-%d")
         lineup_data["Minutes"] = pd.to_datetime(lineup_data["Minutes"], format="%M:%S")
+        lineup_data["Poss"] = lineup_data["OffPoss"]
+        totals["Poss"] = totals["OffPoss"]
         return lineup_data, totals
     
 
@@ -216,45 +212,67 @@ def server(input, output, session):
     def plot():
         try:
             df1,totals = get_lineup_data()
+            df1["TrendLine"] = "Trend Line"
+            df1["AvgLine"] = "Season Avg"
             var = input.stat()
             var1 = var + "1"
             stype = input.stype()
             if stype == "Per 100 Possessions":
-                no_mod = ['PerPoss','Frequency','Accuracy','Pct','TotalPoss','ShotQualityAvg','Pace','Minutes']
+                no_mod = ['PerPoss','Frequency','Accuracy','Pct','Poss','ShotQualityAvg','Pace','Minutes']
                 if any(c in var for c in no_mod):
                     df1[var1] = df1[var]
+                    y_int = totals[var]
                 else:
-                    df1[var1] = df1[var]/df1["TotalPoss"]*100
+                    df1[var1] = df1[var]/df1["Poss"]*100
+                    y_int = totals[var]/totals["Poss"]*100
             else:
                 df1[var1] = df1[var]
+                y_int = totals[var]/len(df1[var])
+                no_mod = ['PerPoss','Frequency','Accuracy','Pct','ShotQualityAvg','Pace']
+                if any(c in var for c in no_mod):
+                    y_int = totals[var]
+                elif "Minutes" in var:
+                    td = dt.timedelta(minutes=totals[var]/len(df1[var]))
+                    y_int = pd.to_datetime(td, format="%H:%M:%S") # type: ignore
             scale_y = []
             if "Pct" in var or "Accuracy" in var or "Frequency" in var:
                 scale_y = scale_y_continuous(labels=percent_format())
             elif "Minutes" in var:
                 scale_y = scale_y_datetime(date_labels = "%M:%S")
+            kwargs_legend = {"alpha":0.0}
             plot = (
-                ggplot(df1,aes(x="Date",y=var1))  
+                ggplot(df1,aes(x="Date",y=var1, color="TrendLine"))  
                 + geom_point(alpha=0.8)
                 + geom_smooth(size=1.5, se=False, method="lowess", span=0.5, alpha=0.5)
-                # + geom_hline(yintercept = totals[var])
+                + geom_hline(aes(color="AvgLine",yintercept = y_int), linetype='dashed', show_legend=True)
                 + scale_x_datetime(date_labels="%b-%d", date_breaks="2 week")
-                # + geom_smooth(size=1.5, se=False, method="mavg", method_args={"window":5, "min_periods":0})
-                # + geom_line()
+                + scale_color_manual(name="Trendline", values=["red","black"])
                 + scale_y
+                # + annotate("text", x=0.80, y=0.78, label=stype)
                 + labs(
                     x="Date",
                     y=var,
-                    title=f"Lineup Stat Trends:  {var}",
-                    subtitle=totals['Name'],
+                    title=f"Lineup Stat Trends: {var}",
+                    subtitle= stype + "\n" + totals['Name'],
                     caption="@SravanNBA",
                 )
                 + theme_xkcd(base_size=16)
                 + theme(
-                    plot_title=element_text(face="bold", size=20),
+                    plot_title=element_text(face="bold", size=18),
                     plot_subtitle=element_text(size=12),
                     plot_margin=0.025,
                     figure_size=[8,6]
                 )
+                + theme(
+                    legend_title=element_blank(),
+                    legend_position = [0.78,0.80],
+                    # legend_position="bottom",
+                    legend_box_margin=0,
+                    legend_background=element_rect(color="grey", size=0.001,**kwargs_legend), # type: ignore
+                    legend_box_background = element_blank(),
+                    legend_text=element_text(size=11),
+                )
+                # + guides(color=guide_legend(ncol=2))
             )
         except:
             plot, ax = plt.subplots(1,1,figsize=(8,6))  
