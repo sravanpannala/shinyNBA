@@ -8,7 +8,9 @@ from shiny import App, ui, render, reactive
 from modules import player_dist_ui, player_dist_server, team_dist_ui, team_dist_server
 
 
-data_DIR = "C:\\Users\\pansr\\Documents\\shinyNBA\\data\\"
+# data_DIR = "C:\\Users\\pansr\\Documents\\shinyNBA\\data\\"
+
+data_DIR = "/var/data/shiny/"
 
 dfp = pd.read_parquet(data_DIR + "NBA_Player_Distribution.parquet")
 dft = pd.read_parquet(data_DIR + "NBA_Team_Distribution.parquet")

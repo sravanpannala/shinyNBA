@@ -44,12 +44,12 @@ def get_viewcount():
     return connections
 
 # Testing
-connections = "100"
-data_DIR = "C:\\Users\\pansr\\Documents\\shinyNBA\\data\\"
+# connections = "100"
+# data_DIR = "C:\\Users\\pansr\\Documents\\shinyNBA\\data\\"
 
 # Deployment
-# connections = str(get_viewcount())
-# data_DIR = "/var/data/shiny/"
+connections = str(get_viewcount())
+data_DIR = "/var/data/shiny/"
 
 df = pd.read_parquet(data_DIR + "lineup_data.parquet")
 teams_list = list(df["team"].unique())

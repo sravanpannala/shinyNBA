@@ -47,12 +47,12 @@ def get_viewcount():
     return connections
 
 # Testing
-connections = "100"
-data_DIR = "C:\\Users\\pansr\\Documents\\shinyNBA\\data\\"
+# connections = "100"
+# data_DIR = "C:\\Users\\pansr\\Documents\\shinyNBA\\data\\"
 
 # Deployment
-# connections = str(get_viewcount())
-# data_DIR = "/var/data/shiny/"
+connections = str(get_viewcount())
+data_DIR = "/var/data/shiny/"
 
 filepath = data_DIR + "NBA_Player_Distribution.parquet"
 date_updated = time.ctime(os.path.getmtime(filepath))
