@@ -253,7 +253,10 @@ def server(input, output, session):
                     x="Date",
                     y=var,
                     title=f"Lineup Stat Trends: {var}",
-                    subtitle= stype + "\n" + totals['Name'],
+                    subtitle= (stype + " | " 
+                               + "Total Possessions Played: " + str(totals["Poss"]) + " | " 
+                               + "Total Minutes Played: " + str(totals["Minutes"]) 
+                               + "\n" + totals['Name']),
                     caption="@SravanNBA",
                 )
                 + theme_xkcd(base_size=16)
