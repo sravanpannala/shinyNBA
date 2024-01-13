@@ -55,11 +55,11 @@ else:
 df = pd.read_parquet(data_DIR + "lineup_data.parquet")
 teams_list = list(df["team"].unique())
 
-dff = df.query(f'team == "ATL"')
+dff = df.query(f'team == "BOS"')
 dff_t = dff[["pid","player"]]
 dff_t = dff_t.set_index("pid")
 player_dict = dff_t.to_dict('dict')['player']
-
+init_players = ['1627759','1628369','1628401','201950','204001']
 
 basic_a = [
     'PlusMinus',
@@ -155,20 +155,23 @@ app_ui = ui.page_fluid(
     ),
     ui.card(
         ui.markdown(""" 
-            Plots Lineup stats for 2023-24 Regular Season. Powered by [PBP Stats API](https://api.pbpstats.com/docs). 
+            Plots Lineup stats for 2023-24 Regular Season. Powered by [PBP Stats API](https://api.pbpstats.com/docs).  
+            Trendline is calculated using Locally Weighted Scatterplot Smoothing. More information [here](https://ggplot2.tidyverse.org/reference/geom_smooth.html) 
             """
         ), 
     ),
     ui.row(
-        ui.column(3,ui.input_selectize("team","Team",teams_list,selected="ATL")),
-        ui.column(9,ui.input_selectize("players","Lineup (Select Exactly 5 players)",player_dict,multiple=True, width="70%")),
+        ui.column(3,ui.input_selectize("team","Team",teams_list,selected="BOS")),
+        ui.column(9,ui.input_selectize("players","Lineup (Select Exactly 5 players)",player_dict, selected=init_players,multiple=True, width="70%")),
     ),
     ui.row(
         ui.column(3,ui.input_selectize("stat","Stat",stats,multiple=False)),
         ui.column(3,ui.input_selectize("stype","Stat Type",["Totals","Per 100 Possessions"],selected="Totals",multiple=False)),
+        ui.column(5,ui.input_action_button("go", "Go!", class_="btn-success"),)
     ),
     ui.card(
         ui.output_plot("plot",  width="900px", height="700px"),
+        # ui.output_ui("my_plot"),
     ),
 )
 
@@ -219,6 +222,7 @@ def server(input, output, session):
     
 
     @render.plot(alt="Stat Trends")
+    @reactive.event(input.go, ignore_none=False)
     def plot():
         try:
             df1,totals = get_lineup_data()
@@ -256,9 +260,9 @@ def server(input, output, session):
             elif "Minutes" in var:
                 scale_y = scale_y_datetime(date_labels = "%M:%S")
             kwargs_legend = {"alpha":0.0}
-            plot = (
+            fig = (
                 ggplot(df1,aes(x="Date",y=var1, color="TrendLine"))  
-                + geom_point(alpha=0.8)
+                + geom_point(fill="white",stroke=1.2)
                 + geom_smooth(size=1.5, se=False, method="lowess", span=0.5, alpha=0.5)
                 + geom_hline(aes(color="AvgLine",yintercept = y_int), linetype='dashed', show_legend=True)
                 + scale_x_datetime(date_labels="%b-%d", date_breaks="2 week")
@@ -295,9 +299,16 @@ def server(input, output, session):
                 + guides(color=guide_legend(ncol=2))
             )
         except:
-            plot, ax = plt.subplots(1,1,figsize=(9,7))  
+            fig, ax = plt.subplots(1,1,figsize=(9,7))  
             ax.text(0.1, 0.85,'Error: Please select exactly 5 players',horizontalalignment='left',verticalalignment='center',transform = ax.transAxes, fontsize=20)
 
-        return plot  
+        return fig  
+    
+    # @render.ui
+    # def my_plot():
+    #     try:
+    #         return ui.output_plot("plot",  width="900px", height="700px")
+    #     except:
+    #         return ui.h3("Error: Please select exactly 5 players")
     
 app = App(app_ui, server)
