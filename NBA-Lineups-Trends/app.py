@@ -307,7 +307,8 @@ def server(input, output, session):
             )
         except Exception as error:
             fig, ax = plt.subplots(1,1,figsize=(9,7))  
-            ax.text(0.1, 0.85,str(error),horizontalalignment='left',verticalalignment='center',transform = ax.transAxes, fontsize=18)
+            ax.text(0.1, 0.95,str(error),horizontalalignment='left',verticalalignment='center',transform = ax.transAxes, fontsize=18)
+            ax.axis('off')
 
         return fig  
     
