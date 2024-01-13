@@ -1,4 +1,5 @@
 import os
+import sys
 import json
 import requests
 import datetime as dt
@@ -22,7 +23,8 @@ from plotnine import (
     geom_hline,
     scale_x_datetime,
     scale_y_datetime,
-    annotate,
+    # annotate,
+    guide_legend,
 )
 from mizani.formatters import percent_format
 
@@ -43,13 +45,12 @@ def get_viewcount():
         connections += log_text.count("open")
     return connections
 
+if sys.platform == "win32":
 # Testing
-# connections = "100"
-# data_DIR = "C:\\Users\\pansr\\Documents\\shinyNBA\\data\\"
-
+    data_DIR = "C:\\Users\\pansr\\Documents\\shinyNBA\\data\\"
+else:
 # Deployment
-connections = str(get_viewcount())
-data_DIR = "/var/data/shiny/"
+    data_DIR = "/var/data/shiny/"
 
 df = pd.read_parquet(data_DIR + "lineup_data.parquet")
 teams_list = list(df["team"].unique())
@@ -167,11 +168,20 @@ app_ui = ui.page_fluid(
         ui.column(3,ui.input_selectize("stype","Stat Type",["Totals","Per 100 Possessions"],selected="Totals",multiple=False)),
     ),
     ui.card(
-        ui.output_plot("plot",  width="800px", height="600px"),
+        ui.output_plot("plot",  width="800px", height="700px"),
     ),
 )
 
 def server(input, output, session):
+
+    @render.text
+    def views():
+        try:
+            txt = str(get_viewcount())
+        except:
+            txt = ""
+        return txt
+
     @reactive.Calc
     def get_player_dict() -> dict:   
         team = input.team()
@@ -258,30 +268,34 @@ def server(input, output, session):
                     x="Date",
                     y=var,
                     title=f"Lineup Stat Trends: {var}",
-                    subtitle= (stype + " | " 
-                               + "Total Possessions Played: " + str(totals["Poss"]) + " | " 
-                               + "Total Minutes Played: " + str(totals["Minutes"]) 
-                               + "\n" + totals['Name']),
-                    caption="@SravanNBA",
+                    subtitle= (
+                        totals['Name'] + "\n"
+                        + stype + " | " 
+                        + "Total Possessions Played: " + str(totals["Poss"]) + " | " 
+                        + "Total Minutes Played: " + str(totals["Minutes"]) 
+                    ),
+                    caption="@SravanNBA | @FearTheBrown",
                 )
                 + theme_xkcd(base_size=16)
                 + theme(
-                    plot_title=element_text(face="bold", size=18),
+                    plot_title=element_text(face="bold", size=20),
                     plot_subtitle=element_text(size=12),
                     plot_margin=0.025,
                     figure_size=[8,6]
                 )
                 + theme(
                     legend_title=element_blank(),
-                    legend_position = [0.78,0.80],
+                    # legend_position = [0.78,0.80],
+                    legend_position="bottom",
                     legend_box_margin=0,
                     legend_background=element_rect(color="grey", size=0.001,**kwargs_legend), # type: ignore
                     legend_box_background = element_blank(),
                     legend_text=element_text(size=11),
                 )
+                + guides(color=guide_legend(ncol=2))
             )
         except:
-            plot, ax = plt.subplots(1,1,figsize=(8,6))  
+            plot, ax = plt.subplots(1,1,figsize=(8,7))  
             ax.text(0.1, 0.85,'Error: Please select exactly 5 players',horizontalalignment='left',verticalalignment='center',transform = ax.transAxes, fontsize=20)
 
         return plot  
