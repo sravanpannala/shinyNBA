@@ -1,4 +1,6 @@
 import os,sys
+from datetime import date
+import asyncio
 import numpy as np
 import pandas as pd
 from plotnine.ggplot import ggplot
@@ -80,7 +82,8 @@ app_ui = ui.page_fluid(
             ui.column(12, ui.input_text("query",ui.h4("Query Box"),value="season >=1984, pts >=60",width="80%")),
         ),
         ui.row(
-            ui.column(3,ui.input_action_button("go", "Go!", class_="btn-success"),)
+            ui.column(3,ui.input_action_button("go", "Go!", class_="btn-success")),
+            ui.column(3,ui.download_button(id="downloadData", label="Download")),
         ),
     ),
     
@@ -113,6 +116,13 @@ def server(input, output, session):
     def df_display():
         display_df = filtered_df()
         return render.DataGrid(display_df, filters=False)
+    
+    @session.download(
+        filename=lambda: f"stats_query-{date.today().isoformat()}-{np.random.randint(100,999)}.csv"
+    )
+    async def downloadData():
+        await asyncio.sleep(0.25)
+        yield filtered_df().to_csv()
     
 
 app = App(app_ui, server)
