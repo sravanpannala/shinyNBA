@@ -63,7 +63,7 @@ app_ui = ui.page_fluid(
     ),
     ui.card(
         ui.markdown(""" 
-            Simple NBA Stat Query Tool.  
+            Simple NBA Stat Query Tool. Searches in Box Scores only!
             Includes **Regular Season** | Data available from **1946-47** onwards and **updated daily**  
             """
         ), 
