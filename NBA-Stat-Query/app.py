@@ -32,10 +32,11 @@ else:
 df = pd.read_parquet(data_DIR + "NBA_Box_P_Base_All.parquet")
 df.columns = map(str.lower, df.columns) # type: ignore
 df = df.sort_values("game_date",ascending=False)
+df['game_date'] = df['game_date'].dt.strftime('%Y-%m-%d')
 df["fg_pct"] = df["fg_pct"]*100
 df["fg3_pct"] = df["fg3_pct"]*100
 df["ft_pct"] = df["ft_pct"]*100
-cols = ['player_name', 'season', 
+cols = ['player_name', 'season', 'game_date',
        'team_name', 'wl', 'pts',
        'oreb', 'dreb', 'reb', 'ast', 'stl', 'blk', 'tov', 'pf', 
        'plus_minus', 'min', 'fgm', 'fga', 'fg_pct', 'fg3m', 'fg3a', 
@@ -48,7 +49,7 @@ stats = ['pts', 'oreb', 'dreb', 'reb', 'ast', 'stl', 'blk', 'tov', 'pf',
 stats_str = stats[0]
 for i in range(len(stats)-1):
     stats_str = stats_str + ", "+ stats[i+1] 
-operators = [">", ">=", "==", "<", "<="]
+operators = [">", ">=", "==", "<", "<=", "!="]
 ops_str = operators[0]
 for i in range(len(operators)-1):
     ops_str = ops_str + ", "+ operators[i+1] 
