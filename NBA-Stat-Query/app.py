@@ -43,7 +43,7 @@ stats = ['pts', 'oreb', 'dreb', 'reb', 'ast', 'stl', 'blk', 'tov', 'pf',
 stats_str = stats[0]
 for i in range(len(stats)-1):
     stats_str = stats_str + ", "+ stats[i+1] 
-operators = [">", ">=", "=", "<", "<="]
+operators = [">", ">=", "==", "<", "<="]
 ops_str = operators[0]
 for i in range(len(operators)-1):
     ops_str = ops_str + ", "+ operators[i+1] 
