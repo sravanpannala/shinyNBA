@@ -29,7 +29,7 @@ else:
 
 df = pd.read_parquet(data_DIR + "NBA_Box_P_Base_All.parquet")
 df.columns = map(str.lower, df.columns) # type: ignore
-
+df = df.sort_values("game_date",ascending=False)
 cols = ['player_name', 'season', 
        'team_name', 'wl', 'pts',
        'oreb', 'dreb', 'reb', 'ast', 'stl', 'blk', 'tov', 'pf', 
@@ -102,8 +102,7 @@ def server(input, output, session):
         qstr1 = input.query()
         qstr = qstr1.replace(","," & ")
         dfc = df.query(qstr)
-        dfc = dfc.sort_values("season",ascending=False)
-
+        # dfc = dfc.sort_values("season",ascending=False)
         # dfc = dfc.head(20)
         return dfc
     
