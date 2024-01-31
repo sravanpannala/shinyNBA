@@ -88,7 +88,7 @@ app_ui = ui.page_fluid(
     ui.card(
         ui.panel_title(ui.h1("Kenan BlackShear Shot Chart")),
         ui.card_footer(ui.h6(ui.markdown("""
-                **By**: [SravanNBA](https://twitter.com/SravanNBA/) & [Neema Djavadzadeh](https://twitter.com/findingneema23)
+                **By**: [Sravan Pannala](https://twitter.com/SravanNBA/) & [Neema Djavadzadeh](https://twitter.com/findingneema23)
             """
             ))
         )
