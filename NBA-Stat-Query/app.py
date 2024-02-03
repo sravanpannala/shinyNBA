@@ -43,9 +43,9 @@ dfb_p = dfb_p[colsb_p]
 dfs_p = pd.read_parquet(data_DIR + "NBA_Box_P_Lead_Base_All.parquet")
 dfs_p.columns = map(str.lower, dfs_p.columns) # type: ignore
 dfs_p = dfs_p.sort_values("season",ascending=False).reset_index(drop=True)
-dfs_p["fg_pct"] = dfs_p["fg_pct"]*100
-dfs_p["fg3_pct"] = dfs_p["fg3_pct"]*100
-dfs_p["ft_pct"] = dfs_p["ft_pct"]*100
+dfs_p["fg_pct"] = round(dfs_p["fg_pct"]*100,3)
+dfs_p["fg3_pct"] = round(dfs_p["fg3_pct"]*100,3)
+dfs_p["ft_pct"] = round(dfs_p["ft_pct"]*100,3)
 colss_p = ['player', 'season', 'team', 'gp', 'pts',
        'oreb', 'dreb', 'reb', 'ast', 'stl', 'blk', 'tov',
        'min', 'fgm', 'fga', 'fg_pct', 'fg3m', 'fg3a', 
