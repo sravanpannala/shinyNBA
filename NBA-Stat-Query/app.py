@@ -1,14 +1,11 @@
-import os,sys
-from datetime import date
-import asyncio
+from pathlib import Path
+import os, sys
 import numpy as np
 import pandas as pd
-from plotnine.ggplot import ggplot
-from plotnine import aes, scale_fill_gradient, theme, element_blank,element_text, geom_tile, geom_text, labs, theme_xkcd, element_rect, element_text
-
-pd.options.mode.chained_assignment =  None
 
 from shiny import App, ui, render, reactive
+
+from modules import player_box_ui, player_box_server, player_season_ui, player_season_server
 
 logs_DIR = "/var/log/shiny-server/"
 
@@ -29,33 +26,53 @@ else:
 # Deployment
     data_DIR = "/var/data/shiny/"
 
-df = pd.read_parquet(data_DIR + "NBA_Box_P_Base_All.parquet")
-df.columns = map(str.lower, df.columns) # type: ignore
-df = df.sort_values("game_date",ascending=False)
-df['game_date'] = df['game_date'].dt.strftime('%Y-%m-%d')
-df["fg_pct"] = df["fg_pct"]*100
-df["fg3_pct"] = df["fg3_pct"]*100
-df["ft_pct"] = df["ft_pct"]*100
-cols = ['player_name', 'season', 'game_date',
+dfb_p = pd.read_parquet(data_DIR + "NBA_Box_P_Base_All.parquet")
+dfb_p.columns = map(str.lower, dfb_p.columns) # type: ignore
+dfb_p = dfb_p.sort_values("game_date",ascending=False)
+dfb_p['game_date'] = dfb_p['game_date'].dt.strftime('%Y-%m-%d')
+dfb_p["fg_pct"] = dfb_p["fg_pct"]*100
+dfb_p["fg3_pct"] = dfb_p["fg3_pct"]*100
+dfb_p["ft_pct"] = dfb_p["ft_pct"]*100
+colsb_p = ['player_name', 'season', 'game_date',
        'team_name', 'wl', 'pts',
        'oreb', 'dreb', 'reb', 'ast', 'stl', 'blk', 'tov', 'pf', 
        'plus_minus', 'min', 'fgm', 'fga', 'fg_pct', 'fg3m', 'fg3a', 
        'fg3_pct', 'ftm', 'fta', 'ft_pct', 'matchup',]
-df = df[cols]
+dfb_p = dfb_p[colsb_p]
 
-stats = ['pts', 'oreb', 'dreb', 'reb', 'ast', 'stl', 'blk', 'tov', 'pf', 
+dfs_p = pd.read_parquet(data_DIR + "NBA_Box_P_Lead_Base_All.parquet")
+dfs_p.columns = map(str.lower, dfs_p.columns) # type: ignore
+dfs_p = dfs_p.sort_values("season",ascending=False)
+dfs_p["fg_pct"] = dfs_p["fg_pct"]*100
+dfs_p["fg3_pct"] = dfs_p["fg3_pct"]*100
+dfs_p["ft_pct"] = dfs_p["ft_pct"]*100
+colss_p = ['player', 'season', 'team', 'gp', 'pts',
+       'oreb', 'dreb', 'reb', 'ast', 'stl', 'blk', 'tov',
+       'min', 'fgm', 'fga', 'fg_pct', 'fg3m', 'fg3a', 
+       'fg3_pct', 'ftm', 'fta', 'ft_pct']
+dfs_p = dfs_p[colss_p]
+
+stats_b_p = ['pts', 'oreb', 'dreb', 'reb', 'ast', 'stl', 'blk', 'tov', 'pf', 
        'plus_minus', 'season', 'min', 'fgm', 'fga', 'fg_pct', 'fg3m', 'fg3a', 
        'fg3_pct', 'ftm', 'fta', 'ft_pct']
-stats_str = stats[0]
-for i in range(len(stats)-1):
-    stats_str = stats_str + ", "+ stats[i+1] 
+stats_str_b_p = stats_b_p[0]
+for i in range(len(stats_b_p)-1):
+    stats_str_b_p = stats_str_b_p + ", "+ stats_b_p[i+1] 
+
+stats_s_p = ['gp', 'pts',
+       'oreb', 'dreb', 'reb', 'ast', 'stl', 'blk', 'tov',
+       'min', 'fgm', 'fga', 'fg_pct', 'fg3m', 'fg3a', 
+       'fg3_pct', 'ftm', 'fta', 'ft_pct']
+stats_str_s_p = stats_s_p[0]
+for i in range(len(stats_s_p)-1):
+    stats_str_s_p = stats_str_s_p + ", "+ stats_s_p[i+1] 
+
 operators = [">", ">=", "==", "<", "<=", "!="]
 ops_str = operators[0]
 for i in range(len(operators)-1):
     ops_str = ops_str + ", "+ operators[i+1] 
 
 app_ui = ui.page_fluid(
-    # ui.head_content(ui.include_js("gtag.js",method="inline")),
     ui.card(
         ui.panel_title(ui.h1("NBA Stat Query")),
         ui.card_footer(ui.h6(ui.markdown("""
@@ -66,30 +83,15 @@ app_ui = ui.page_fluid(
     ),
     ui.card(
         ui.markdown(""" 
-            Simple NBA Stat Query Tool. Searches Box Scores only!  
+            Simple NBA Stat Query Tool. Searches Box Scores and Seasons.  
             Includes **Regular Season** | Data available from **1946-47** onwards and **updated daily**  
             """
         ), 
     ),
-    ui.card(
-        ui.panel_title(ui.h4("Instructions")),
-        ui.markdown(""" 
-            **Available stats**: {0}  
-            **Available operators**: {1}  
-            Write down the stat name, then the operator and the value. You can use "," as a separator for multiple queries.          
-            """.format(stats_str,ops_str)
-        ), 
-        ui.row(
-            ui.column(12, ui.input_text("query",ui.h4("Query Box"),value="season >=1984, pts >=60",width="80%")),
-        ),
-        ui.row(
-            ui.column(3,ui.input_action_button("go", "Go!", class_="btn-success")),
-            ui.column(3,ui.download_button(id="downloadData", label="Download")),
-        ),
-    ),
-    
-    ui.output_data_frame("df_display"),
-    
+    ui.navset_tab(
+        player_box_ui("Player_Box_Score",stats_str_b_p,ops_str),
+        player_season_ui("Player_Season",stats_str_s_p,ops_str),
+    )
 )
 
 
@@ -102,28 +104,9 @@ def server(input, output, session):
         except:
             txt = ""
         return txt
-    
-    @reactive.Calc
-    def filtered_df() -> pd.DataFrame:
-        qstr1 = input.query()
-        qstr = qstr1.replace(","," & ")
-        qstr = qstr.lower()
-        dfc = df.query(qstr)
 
-        return dfc
-    
-    @render.data_frame
-    @reactive.event(input.go, ignore_none=False)
-    def df_display():
-        display_df = filtered_df()
-        return render.DataGrid(display_df, filters=False)
-    
-    @session.download(
-        filename=lambda: f"stats_query-{date.today().isoformat()}-{np.random.randint(100,999)}.csv"
-    )
-    async def downloadData():
-        await asyncio.sleep(0.25)
-        yield filtered_df().to_csv()
-    
+    player_box_server(id="Player_Box_Score",df=dfb_p)  # type: ignore
+    player_season_server(id="Player_Season",df=dfs_p) # type: ignore
+
 
 app = App(app_ui, server)
