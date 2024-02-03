@@ -28,7 +28,7 @@ else:
 
 dfb_p = pd.read_parquet(data_DIR + "NBA_Box_P_Base_All.parquet")
 dfb_p.columns = map(str.lower, dfb_p.columns) # type: ignore
-dfb_p = dfb_p.sort_values("game_date",ascending=False)
+dfb_p = dfb_p.sort_values("game_date",ascending=False).reset_index(drop=True)
 dfb_p['game_date'] = dfb_p['game_date'].dt.strftime('%Y-%m-%d')
 dfb_p["fg_pct"] = dfb_p["fg_pct"]*100
 dfb_p["fg3_pct"] = dfb_p["fg3_pct"]*100
@@ -42,7 +42,7 @@ dfb_p = dfb_p[colsb_p]
 
 dfs_p = pd.read_parquet(data_DIR + "NBA_Box_P_Lead_Base_All.parquet")
 dfs_p.columns = map(str.lower, dfs_p.columns) # type: ignore
-dfs_p = dfs_p.sort_values("season",ascending=False)
+dfs_p = dfs_p.sort_values("season",ascending=False).reset_index(drop=True)
 dfs_p["fg_pct"] = dfs_p["fg_pct"]*100
 dfs_p["fg3_pct"] = dfs_p["fg3_pct"]*100
 dfs_p["ft_pct"] = dfs_p["ft_pct"]*100
