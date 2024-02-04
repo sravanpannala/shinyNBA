@@ -40,13 +40,13 @@ colsb_p = ['player_name', 'season', 'game_date',
        'fg3_pct', 'ftm', 'fta', 'ft_pct', 'matchup',]
 dfb_p = dfb_p[colsb_p]
 
-dfs_p = pd.read_parquet(data_DIR + "NBA_Box_P_Lead_Base_All.parquet")
+dfs_p = pd.read_parquet(data_DIR + "NBA_Box_P_Cum_Base_All.parquet")
 dfs_p.columns = map(str.lower, dfs_p.columns) # type: ignore
 dfs_p = dfs_p.sort_values("season",ascending=False).reset_index(drop=True)
 dfs_p["fg_pct"] = round(dfs_p["fg_pct"]*100,3)
 dfs_p["fg3_pct"] = round(dfs_p["fg3_pct"]*100,3)
 dfs_p["ft_pct"] = round(dfs_p["ft_pct"]*100,3)
-colss_p = ['player', 'season', 'team', 'gp', 'pts',
+colss_p = ['player_name', 'season', 'team_name', 'gp', 'w', 'l', 'pts',
        'oreb', 'dreb', 'reb', 'ast', 'stl', 'blk', 'tov',
        'min', 'fgm', 'fga', 'fg_pct', 'fg3m', 'fg3a', 
        'fg3_pct', 'ftm', 'fta', 'ft_pct']
@@ -59,7 +59,7 @@ stats_str_b_p = stats_b_p[0]
 for i in range(len(stats_b_p)-1):
     stats_str_b_p = stats_str_b_p + ", "+ stats_b_p[i+1] 
 
-stats_s_p = ['gp', 'pts',
+stats_s_p = ['gp', 'w', 'l', 'pts',
        'oreb', 'dreb', 'reb', 'ast', 'stl', 'blk', 'tov',
        'min', 'fgm', 'fga', 'fg_pct', 'fg3m', 'fg3a', 
        'fg3_pct', 'ftm', 'fta', 'ft_pct']
