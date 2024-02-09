@@ -44,8 +44,8 @@ dfb_p = dfb_p[colsb_p]
 dfb_p_w = pd.read_parquet(data_DIR + "WNBA_Box_P_Base_All.parquet")
 dfb_p_w.columns = map(str.lower, dfb_p_w.columns) # type: ignore
 dfb_p_w = dfb_p_w.sort_values("game_date",ascending=False).reset_index(drop=True)
-# dfb_p_w['game_date'] = dfb_p_w['game_date'].dt.strftime('%Y-%m-%d')
 dfb_p_w['game_date'] = pd.to_datetime(dfb_p_w['game_date'],format="%Y-%m-%d")
+dfb_p_w['game_date'] = dfb_p_w['game_date'].dt.strftime('%Y-%m-%d')
 dfb_p_w["fg_pct"] = dfb_p_w["fg_pct"]*100
 dfb_p_w["fg3_pct"] = dfb_p_w["fg3_pct"]*100
 dfb_p_w["ft_pct"] = dfb_p_w["ft_pct"]*100
