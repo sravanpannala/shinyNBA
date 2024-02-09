@@ -35,7 +35,7 @@ def ui_func(stats_str,ops_str):
 @module.ui
 def player_box_ui(stats_str: str,ops_str: str):
     return ui.nav_panel(
-            ui.h4("Player Box Scores"),
+            ui.h4("NBA Player Box Scores"),
             ui.page_fluid(
                 ui.card(
                     ui.panel_title(ui.h4("Instructions")),
@@ -60,7 +60,7 @@ def player_box_ui(stats_str: str,ops_str: str):
 @module.ui
 def player_season_ui(stats_str: str,ops_str: str):
     return ui.nav_panel(
-            ui.h4("Player Season"),
+            ui.h4("NBA Player Season"),
             ui.page_fluid(
                 ui.card(
                     ui.panel_title(ui.h4("Instructions")),
@@ -79,6 +79,56 @@ def player_season_ui(stats_str: str,ops_str: str):
                     ),
                 ),
                 ui.output_data_frame("df_display2"),
+            )   
+    )
+
+@module.ui
+def player_box_ui_w(stats_str: str,ops_str: str):
+    return ui.nav_panel(
+            ui.h4("WNBA Player Box Scores"),
+            ui.page_fluid(
+                ui.card(
+                    ui.panel_title(ui.h4("Instructions")),
+                    ui.markdown(""" 
+                        **Available stats**: {0}  
+                        **Available operators**: {1}  
+                        Write down the stat name, then the operator and the value. You can use "," as a separator for multiple queries.          
+                        """.format(stats_str,ops_str)
+                    ), 
+                    ui.row(
+                        ui.column(12, ui.input_text("query3",ui.h4("Query Box"),value="season >=1997, pts >=40",width="80%")),
+                    ),
+                    ui.row(
+                        ui.column(3,ui.input_action_button("go3", "Go!", class_="btn-success")),
+                        ui.column(3,ui.download_button(id="downloadData3", label="Download")),
+                    ),
+                ),
+                ui.output_data_frame("df_display3"),
+            )   
+    )
+
+@module.ui
+def player_season_ui_w(stats_str: str,ops_str: str):
+    return ui.nav_panel(
+            ui.h4("WNBA Player Season"),
+            ui.page_fluid(
+                ui.card(
+                    ui.panel_title(ui.h4("Instructions")),
+                    ui.markdown(""" 
+                        **Available stats**: {0}  
+                        **Available operators**: {1}  
+                        Write down the stat name, then the operator and the value. You can use "," as a separator for multiple queries.          
+                        """.format(stats_str,ops_str)
+                    ), 
+                    ui.row(
+                        ui.column(12, ui.input_text("query4",ui.h4("Query Box"),value="season >=1997, pts >=20",width="80%")),
+                    ),
+                    ui.row(
+                        ui.column(3,ui.input_action_button("go4", "Go!", class_="btn-success")),
+                        ui.column(3,ui.download_button(id="downloadData4", label="Download")),
+                    ),
+                ),
+                ui.output_data_frame("df_display4"),
             )   
     )
 
@@ -146,3 +196,61 @@ def player_season_server(
     async def downloadData2():
         await asyncio.sleep(0.25)
         yield filtered_df2().to_csv()
+
+@module.server
+def player_box_server_w(
+    input: Inputs,
+    output: Outputs,
+    session: Session,
+    df: DataFrame,
+):
+    @reactive.Calc
+    def filtered_df3() -> pd.DataFrame:
+        qstr1 = input.query3()
+        qstr = qstr1.replace(","," & ")
+        qstr = qstr.lower()
+        dfc = df.query(qstr)
+
+        return dfc
+    
+    @render.data_frame
+    @reactive.event(input.go3, ignore_none=False)
+    def df_display3():
+        display_df = filtered_df3()
+        return render.DataGrid(display_df, filters=False)
+    
+    @session.download(
+        filename=lambda: f"stats_query-{date.today().isoformat()}-{np.random.randint(100,999)}.csv"
+    )
+    async def downloadData3():
+        await asyncio.sleep(0.25)
+        yield filtered_df3().to_csv()
+
+@module.server
+def player_season_server_w(
+    input: Inputs,
+    output: Outputs,
+    session: Session,
+    df: DataFrame,
+):
+    @reactive.Calc
+    def filtered_df4() -> pd.DataFrame:
+        qstr1 = input.query4()
+        qstr = qstr1.replace(","," & ")
+        qstr = qstr.lower()
+        dfc = df.query(qstr)
+
+        return dfc
+    
+    @render.data_frame
+    @reactive.event(input.go4, ignore_none=False)
+    def df_display4():
+        display_df = filtered_df4()
+        return render.DataGrid(display_df, filters=False)
+    
+    @session.download(
+        filename=lambda: f"stats_query-{date.today().isoformat()}-{np.random.randint(100,999)}.csv"
+    )
+    async def downloadData4():
+        await asyncio.sleep(0.25)
+        yield filtered_df4().to_csv()
