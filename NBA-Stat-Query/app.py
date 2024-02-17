@@ -117,7 +117,7 @@ app_ui = ui.page_fluid(
         ), 
     ),
     ui.navset_tab(
-        player_box_ui("Player_Box_Score",stats_str_b_p,ops_str),
+        player_box_ui("Player_Box_Score",stats_str_b_p,ops_str), # type: ignore
         player_season_ui("Player_Season",stats_str_s_p,ops_str),
         player_box_ui_w("Player_Box_Score_w",stats_str_b_p,ops_str),
         player_season_ui_w("Player_Season_w",stats_str_s_p,ops_str),
