@@ -109,7 +109,7 @@ app_ui = ui.page_fluid(
     ui.card(
         ui.panel_title(ui.h1("NBA & WNBA Stat Query")),
         ui.card_footer(ui.h6(ui.markdown("""
-                **By**: [SravanNBA](https://twitter.com/SravanNBA/) | **App views**: {0} | Updated on **{1}**
+                **By**: [SravanNBA](https://twitter.com/SravanNBA/) | **App views**: {0} | Updated on **{1} UTC**
             """.format(ui.output_text("views",inline=True),date_updated)
             ))
         )
