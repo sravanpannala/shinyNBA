@@ -1,5 +1,6 @@
 from pathlib import Path
 import os, time, sys
+from datetime import datetime
 import numpy as np
 import pandas as pd
 from plotnine.ggplot import ggplot
@@ -53,7 +54,8 @@ else:
     data_DIR = "/var/data/shiny/"
 
 filepath = data_DIR + "NBA_Player_Distribution.parquet"
-date_updated = time.ctime(os.path.getmtime(filepath))
+tstamp = os.path.getmtime(filepath)
+date_updated = datetime.fromtimestamp(tstamp).strftime('%A %d %b, %Y - %H:%M:%S')
 df = pd.read_parquet(filepath)
 
 players = list(df["Player"].unique())

@@ -1,5 +1,6 @@
 from pathlib import Path
 import os, sys
+from datetime import datetime
 import numpy as np
 import pandas as pd
 
@@ -27,7 +28,11 @@ else:
 # Deployment
     data_DIR = "/var/data/shiny/"
 
-dfb_p = pd.read_parquet(data_DIR + "NBA_Box_P_Base_All.parquet")
+filepath = data_DIR + "NBA_Box_P_Base_All.parquet"
+tstamp = os.path.getmtime(filepath)
+date_updated = datetime.fromtimestamp(tstamp).strftime('%A %d %b, %Y - %H:%M:%S')
+
+dfb_p = pd.read_parquet(filepath)
 dfb_p.columns = map(str.lower, dfb_p.columns) # type: ignore
 dfb_p = dfb_p.sort_values("game_date",ascending=False).reset_index(drop=True)
 dfb_p['game_date'] = dfb_p['game_date'].dt.strftime('%Y-%m-%d')
@@ -104,15 +109,15 @@ app_ui = ui.page_fluid(
     ui.card(
         ui.panel_title(ui.h1("NBA & WNBA Stat Query")),
         ui.card_footer(ui.h6(ui.markdown("""
-                **By**: [SravanNBA](https://twitter.com/SravanNBA/) | **App views**: {0}
-            """.format(ui.output_text("views",inline=True))
+                **By**: [SravanNBA](https://twitter.com/SravanNBA/) | **App views**: {0} | Updated on **{1}**
+            """.format(ui.output_text("views",inline=True),date_updated)
             ))
         )
     ),
     ui.card(
         ui.markdown(""" 
             Simple NBA Stat Query Tool. Searches Box Scores and Seasons.  
-            Includes **Regular Season** | Data available from **1946-47** onwards and **updated daily**  
+            Includes **Regular Season** | Data available from **1946-47** onwards
             """
         ), 
     ),

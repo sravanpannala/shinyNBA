@@ -1,4 +1,5 @@
 import os
+from datetime import datetime
 import numpy as np
 import pandas as pd
 from plotnine.ggplot import ggplot
@@ -28,7 +29,11 @@ def get_viewcount():
 connections = str(get_viewcount())
 data_DIR = "/var/data/shiny/"
 
-df = pd.read_parquet(data_DIR + "NBA_Player_Scorigami.parquet")
+filepath = data_DIR + "NBA_Player_Scorigami.parquet"
+tstamp = os.path.getmtime(filepath)
+date_updated = datetime.fromtimestamp(tstamp).strftime('%A %d %b, %Y - %H:%M:%S')
+
+df = pd.read_parquet(filepath)
 
 players = list(df["Player"].unique())
 vars = ["Points", "Assists", "Rebounds", "Steals", "Blocks","Turnovers", "3Pt Shots Made", "Free Throws Made"]
@@ -58,15 +63,15 @@ app_ui = ui.page_fluid(
     ui.card(
         ui.panel_title(ui.h1("NBA Box Scorigami")),
         ui.card_footer(ui.h6(ui.markdown("""
-                **By**: [SravanNBA](https://twitter.com/SravanNBA/) | **App views**: {0}
-            """.format(ui.output_text("views",inline=True))
+                **By**: [SravanNBA](https://twitter.com/SravanNBA/) | **App views**: {0} | Updated on **{1}**
+            """.format(ui.output_text("views",inline=True),date_updated)
             ))
         )
     ),
     ui.card(
         ui.markdown(""" 
             Heavily inpsired by [Todd Whitehead's](https://twitter.com/CrumpledJumper) [Box Scorigami](https://x.com/CrumpledJumper/status/1740251518840996135?s=20) of Kevin Durant.  
-            Includes **Regular Season** & **Playoffs** | Data available only from **1996-97** onwards | Data **updated daily**  
+            Includes **Regular Season** & **Playoffs** | Data available only from **1996-97** onwards
             """
         ), 
     ),
