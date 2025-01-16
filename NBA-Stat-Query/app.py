@@ -57,7 +57,7 @@ dfb_p_w["ft_pct"] = dfb_p_w["ft_pct"]*100
 colsb_p_w = ['player_name', 'season', 'game_date',
        'team_name', 'wl', 'pts',
        'oreb', 'dreb', 'reb', 'ast', 'stl', 'blk', 'tov', 'pf', 
-       'plus_minus', 'min', 'fgm', 'fga', 'fg_pct', 'fg3m', 'fg3a', 
+       'plus_minus', 'min', 'ts_pct', 'fgm', 'fga', 'fg_pct', 'fg3m', 'fg3a', 
        'fg3_pct', 'ftm', 'fta', 'ft_pct', 'matchup',]
 dfb_p_w = dfb_p_w[colsb_p_w]
 
@@ -81,13 +81,13 @@ dfs_p_w["fg3_pct"] = round(dfs_p_w["fg3_pct"]*100,3)
 dfs_p_w["ft_pct"] = round(dfs_p_w["ft_pct"]*100,3)
 colss_p_w = ['player_name', 'season', 'team_name', 'gp', 'w', 'l', 'pts',
        'oreb', 'dreb', 'reb', 'ast', 'stl', 'blk', 'tov',
-       'min', 'fgm', 'fga', 'fg_pct', 'fg3m', 'fg3a', 
+       'min', 'ts_pct', 'fgm', 'fga', 'fg_pct', 'fg3m', 'fg3a', 
        'fg3_pct', 'ftm', 'fta', 'ft_pct']
 dfs_p_w = dfs_p_w[colss_p_w]
 
 stats_b_p = ['pts', 'oreb', 'dreb', 'reb', 'ast', 'stl', 'blk', 'tov', 'pf', 
        'plus_minus', 'season', 'min', 'fgm', 'fga', 'fg_pct', 'fg3m', 'fg3a', 
-       'fg3_pct', 'ftm', 'fta', 'ft_pct']
+       'fg3_pct', 'ftm', 'fta', 'ft_pct', 'ts_pct']
 stats_str_b_p = stats_b_p[0]
 for i in range(len(stats_b_p)-1):
     stats_str_b_p = stats_str_b_p + ", "+ stats_b_p[i+1] 
@@ -95,7 +95,7 @@ for i in range(len(stats_b_p)-1):
 stats_s_p = ['gp', 'w', 'l', 'pts',
        'oreb', 'dreb', 'reb', 'ast', 'stl', 'blk', 'tov',
        'min', 'fgm', 'fga', 'fg_pct', 'fg3m', 'fg3a', 
-       'fg3_pct', 'ftm', 'fta', 'ft_pct']
+       'fg3_pct', 'ftm', 'fta', 'ft_pct', 'ts_pct']
 stats_str_s_p = stats_s_p[0]
 for i in range(len(stats_s_p)-1):
     stats_str_s_p = stats_str_s_p + ", "+ stats_s_p[i+1] 
