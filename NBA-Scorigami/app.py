@@ -128,12 +128,13 @@ def server(input, output, session):
             + labs(
                 title = player + ": Box Scorigami",
                 subtitle = f"# NBA Games with different combinations of\n  {var1} & {var2}",
-                caption = "@SravanNBA\nshiny.sradjoker.cc/NBA-Scorigami",
+                caption = "bsky: sradjoker.cc | x:@SravanNBA\nshiny.sradjoker.cc/NBA-Scorigami",
                 x = var2,
                 y = var1,
             )
             + theme_xkcd(base_size=14, stroke_color="none")
             + theme(
+                text=element_text(family=["Comic Sans MS"]),
                 plot_background = element_rect(fill = 'white', color = "white"),
                 legend_position="none",
                 plot_title=element_text(face="bold", size=18),
