@@ -1,4 +1,4 @@
-import os
+import os, sys
 from datetime import datetime
 import numpy as np
 import pandas as pd
@@ -21,13 +21,13 @@ def get_viewcount():
         connections += log_text.count("open")
     return connections
 
-# Testing
-# connections = "100"
-# data_DIR = "C:\\Users\\pansr\\Documents\\shinyNBA\\data\\"
 
+if sys.platform == "win32":
+# Testing
+    data_DIR = "C:\\Users\\pansr\\Documents\\shinyNBA\\data\\"
+else:
 # Deployment
-connections = str(get_viewcount())
-data_DIR = "/var/data/shiny/"
+    data_DIR = "/var/data/shiny/"
 
 filepath = data_DIR + "NBA_Player_Scorigami.parquet"
 tstamp = os.path.getmtime(filepath)
@@ -95,7 +95,10 @@ def server(input, output, session):
 
     @render.text
     def views():
-        txt = str(get_viewcount())
+        try:
+            txt = str(get_viewcount())
+        except:
+            txt = ""
         return txt
 
     @reactive.Calc
@@ -128,20 +131,21 @@ def server(input, output, session):
             + labs(
                 title = player + ": Box Scorigami",
                 subtitle = f"# NBA Games with different combinations of\n  {var1} & {var2}",
-                caption = "bsky: sradjoker.cc | x:@SravanNBA\nshiny.sradjoker.cc/NBA-Scorigami",
+                caption = "shiny.sradjoker.cc/NBA-Scorigami",
                 x = var2,
                 y = var1,
             )
             + theme_xkcd(base_size=14, stroke_color="none")
             + theme(
-                text=element_text(family=["Comic Sans MS"]),
+                figure_size= (6,6),
                 plot_background = element_rect(fill = 'white', color = "white"),
                 legend_position="none",
                 plot_title=element_text(face="bold", size=18),
                 plot_subtitle=element_text(size=13),
-                plot_caption=element_text(hjust=0),
-                figure_size= (6,6),
+                plot_caption=element_text(vjust=-0.04,hjust=0,size=10),
                 axis_text_y = element_text(size = 12, vjust=1),
+                text=element_text(family=["Comic Sans MS"]),
+                plot_margin=0.02,
             )
             + theme(
                 axis_ticks_major_y=element_blank(),
@@ -151,7 +155,6 @@ def server(input, output, session):
                 panel_grid_major_y=element_blank(),
                 panel_grid_major_x=element_blank(),
                 panel_border=element_blank(),
-
             )
         )
         return p
