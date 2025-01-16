@@ -121,7 +121,7 @@ def server(input, output, session):
         cat1 = get_cat(var1)
         cat2 = get_cat(var2)
         p = (
-            ggplot(dfc,aes(x=cat1, y=cat2, fill="Counts"))
+            ggplot(dfc,aes(x=cat2, y=cat1, fill="Counts"))
             + geom_tile(aes(width=.88, height=.88))
             + geom_text(aes(label='Counts'), size=14, show_legend=False, fontweight = "bold") 
             + scale_fill_gradient(low = "#f2f2f2", high = "red")
