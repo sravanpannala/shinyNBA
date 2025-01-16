@@ -39,10 +39,11 @@ dfb_p['game_date'] = dfb_p['game_date'].dt.strftime('%Y-%m-%d')
 dfb_p["fg_pct"] = dfb_p["fg_pct"]*100
 dfb_p["fg3_pct"] = dfb_p["fg3_pct"]*100
 dfb_p["ft_pct"] = dfb_p["ft_pct"]*100
+dfb_p["ts_pct"] = dfb_p["ts_pct"]*100
 colsb_p = ['player_name', 'season', 'game_date',
        'team_name', 'wl', 'pts',
        'oreb', 'dreb', 'reb', 'ast', 'stl', 'blk', 'tov', 'pf', 
-       'plus_minus', 'min', 'fgm', 'fga', 'fg_pct', 'fg3m', 'fg3a', 
+       'plus_minus', 'min', 'ts_pct', 'fgm', 'fga', 'fg_pct', 'fg3m', 'fg3a', 
        'fg3_pct', 'ftm', 'fta', 'ft_pct', 'matchup',]
 dfb_p = dfb_p[colsb_p]
 
@@ -54,6 +55,7 @@ dfb_p_w['game_date'] = dfb_p_w['game_date'].dt.strftime('%Y-%m-%d')
 dfb_p_w["fg_pct"] = dfb_p_w["fg_pct"]*100
 dfb_p_w["fg3_pct"] = dfb_p_w["fg3_pct"]*100
 dfb_p_w["ft_pct"] = dfb_p_w["ft_pct"]*100
+dfb_p_w["ts_pct"] = dfb_p_w["ts_pct"]*100
 colsb_p_w = ['player_name', 'season', 'game_date',
        'team_name', 'wl', 'pts',
        'oreb', 'dreb', 'reb', 'ast', 'stl', 'blk', 'tov', 'pf', 
@@ -67,9 +69,10 @@ dfs_p = dfs_p.sort_values("season",ascending=False).reset_index(drop=True)
 dfs_p["fg_pct"] = round(dfs_p["fg_pct"]*100,3)
 dfs_p["fg3_pct"] = round(dfs_p["fg3_pct"]*100,3)
 dfs_p["ft_pct"] = round(dfs_p["ft_pct"]*100,3)
+dfs_p["ts_pct"] = round(dfs_p["ts_pct"]*100,3)
 colss_p = ['player_name', 'season', 'team_name', 'gp', 'w', 'l', 'pts',
        'oreb', 'dreb', 'reb', 'ast', 'stl', 'blk', 'tov',
-       'min', 'fgm', 'fga', 'fg_pct', 'fg3m', 'fg3a', 
+       'min', 'ts_pct', 'fgm', 'fga', 'fg_pct', 'fg3m', 'fg3a', 
        'fg3_pct', 'ftm', 'fta', 'ft_pct']
 dfs_p = dfs_p[colss_p]
 
@@ -79,6 +82,7 @@ dfs_p_w = dfs_p_w.sort_values("season",ascending=False).reset_index(drop=True)
 dfs_p_w["fg_pct"] = round(dfs_p_w["fg_pct"]*100,3)
 dfs_p_w["fg3_pct"] = round(dfs_p_w["fg3_pct"]*100,3)
 dfs_p_w["ft_pct"] = round(dfs_p_w["ft_pct"]*100,3)
+dfs_p_w["ts_pct"] = round(dfs_p_w["ts_pct"]*100,3)
 colss_p_w = ['player_name', 'season', 'team_name', 'gp', 'w', 'l', 'pts',
        'oreb', 'dreb', 'reb', 'ast', 'stl', 'blk', 'tov',
        'min', 'ts_pct', 'fgm', 'fga', 'fg_pct', 'fg3m', 'fg3a', 
