@@ -129,8 +129,8 @@ def server(input, output, session):
                 title = player + ": Box Scorigami",
                 subtitle = f"# NBA Games with different combinations of\n  {var1} & {var2}",
                 caption = "@SravanNBA\nshiny.sradjoker.cc/NBA-Scorigami",
-                x = var1,
-                y = var2,
+                x = var2,
+                y = var1,
             )
             + theme_xkcd(base_size=14, stroke_color="none")
             + theme(
