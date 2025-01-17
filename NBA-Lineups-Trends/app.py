@@ -55,12 +55,12 @@ else:
 df = pd.read_parquet(data_DIR + "lineup_data.parquet")
 teams_list = list(df["team"].unique())
 
-dff = df.query(f'team == "NOP"')
+dff = df.query(f'team == "CLE"')
 dff_t = dff[["pid","player"]]
 dff_t = dff_t.set_index("pid")
 player_dict = dff_t.to_dict('dict')['player']
 
-init_players = ['1627742','1629627','1630529','202685','203468']
+init_players = ['1628378', '1628386', '1629731', '1629636', '1630596']
 
 basic_a = [
     'PlusMinus',
@@ -132,7 +132,7 @@ stats = {"Basic":basic,"Shooting":shooting,"Misc":misc}
 def get_game_logs(lineup):
     url = "https://api.pbpstats.com/get-game-logs/nba"
     params = {
-        "Season": "2023-24", # To get for multiple seasons, separate seasons by comma
+        "Season": "2024-25", # To get for multiple seasons, separate seasons by comma
         "SeasonType": "Regular Season",
         "EntityId": lineup,
         "EntityType": "Lineup" # Use LineupOpponent to get opponent stats
@@ -156,13 +156,13 @@ app_ui = ui.page_fluid(
     ),
     ui.card(
         ui.markdown(""" 
-            Plots Lineup stats for 2023-24 Regular Season. Powered by [PBP Stats API](https://api.pbpstats.com/docs).  
+            Plots Lineup stats for 2024-25 Regular Season. Powered by [PBP Stats API](https://api.pbpstats.com/docs).  
             Trendline is calculated using Locally Weighted Scatterplot Smoothing. More information [here](https://ggplot2.tidyverse.org/reference/geom_smooth.html) 
             """
         ), 
     ),
     ui.row(
-        ui.column(3,ui.input_selectize("team","Team",teams_list,selected="NOP")),
+        ui.column(3,ui.input_selectize("team","Team",teams_list,selected="CLE")),
         ui.column(9,ui.input_selectize("players","Lineup (Select Exactly 5 players)",player_dict, selected=init_players,multiple=True, width="70%")),
     ),
     ui.row(
@@ -207,6 +207,7 @@ def server(input, output, session):
     def get_lineup_data() -> tuple[pd.DataFrame, dict]:   
         player_dict = get_player_dict()
         lineup_in = list(input.players())
+        print(lineup_in)
         if len(lineup_in)!=5:
             raise Exception("Error: Please select exactly 5 players")
         # lineup_names = [player_dict[ll] for ll in lineup_in]
