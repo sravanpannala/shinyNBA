@@ -9,6 +9,11 @@ pd.options.mode.chained_assignment =  None
 
 from shiny import App, ui, render, reactive
 
+#import shutil
+#import matplotlib
+
+#shutil.rmtree(matplotlib.get_cachedir())
+
 logs_DIR = "/var/log/shiny-server/"
 
 def get_viewcount():
@@ -114,7 +119,7 @@ def server(input, output, session):
         dfc = dfc.reset_index()
 
         return dfc
-    
+   
     @render.plot(alt="NBA Scorigami")
     def plt():
         dfc = filtered_df()
@@ -137,14 +142,14 @@ def server(input, output, session):
             )
             + theme_xkcd(base_size=14, stroke_color="none")
             + theme(
-                figure_size= (6,6),
+                figure_size= (12,12),
                 plot_background = element_rect(fill = 'white', color = "white"),
                 legend_position="none",
                 plot_title=element_text(face="bold", size=18),
-                plot_subtitle=element_text(size=13),
+                plot_subtitle=element_text(size=13,weight="normal",linespacing=1.5),
                 plot_caption=element_text(vjust=-0.04,hjust=0,size=10),
                 axis_text_y = element_text(size = 12, vjust=1),
-                text=element_text(family=["Comic Sans MS"]),
+                text=element_text(family=["Comic Neue"],weight="bold"),
                 plot_margin=0.02,
             )
             + theme(
