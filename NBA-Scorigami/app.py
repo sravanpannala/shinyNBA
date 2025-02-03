@@ -41,7 +41,8 @@ date_updated = datetime.fromtimestamp(tstamp).strftime('%A %d %b, %Y - %H:%M:%S'
 df = pd.read_parquet(filepath)
 
 players = list(df["Player"].unique())
-vars = ["Points", "Assists", "Rebounds", "Steals", "Blocks","Turnovers", "3Pt Shots Made", "Free Throws Made"]
+vars = ["Points", "Assists", "Rebounds", "Rebounds+Assists", "Steals", "Blocks","Turnovers", "3Pt Shots Made", "Free Throws Made"]
+
 
 def get_cat(var):
     var_cat = ""
@@ -51,6 +52,8 @@ def get_cat(var):
         var_cat = "Ast_cat"
     elif var == "Rebounds":
         var_cat = "Reb_cat"
+    elif var == "Rebounds+Assists":
+        var_cat = "Reb_Ast_cat"
     elif var == "Steals":
         var_cat = "Stl_cat"
     elif var == "Blocks":
@@ -68,7 +71,7 @@ app_ui = ui.page_fluid(
     ui.card(
         ui.panel_title(ui.h1("NBA Box Scorigami")),
         ui.card_footer(ui.h6(ui.markdown("""
-                **By**: [SravanNBA](https://twitter.com/SravanNBA/) | **App views**: {0} | Updated on **{1} UTC**
+                **By**: Sravan [bsky](https://bsky.app/profile/sradjoker.cc) [X](https://x.com/SravanNBA/) | **App views**: {0} | Updated on **{1} UTC**
             """.format(ui.output_text("views",inline=True),date_updated)
             ))
         )
