@@ -16,7 +16,7 @@ def player_test_ui(vars: list[str],players: list[str],seasons: list[str]):
                 ui.card(
                     ui.panel_title(ui.h2("NBA Player Stat Distribution and Trends")),
                     ui.card_footer(ui.h5(ui.markdown("""
-                            **By**: [SravanNBA](https://twitter.com/SravanNBA/)
+                            **By**: [Sravan](https://x.com/SravanNBA/)
                         """
                         ))
                     )
@@ -38,19 +38,19 @@ def player_dist_ui(vars: list[str],players: list[str],seasons: list[str]):
                     ),
                     ui.row(
                         ui.column(8, ui.input_selectize("player_name1","Player 1",players, selected="LeBron James")),
-                        ui.column(4, ui.input_selectize("season1","Season",seasons, selected="2024")),
+                        ui.column(4, ui.input_selectize("season1","Season",seasons, selected="2025")),
                     ),
                     ui.row(
                         ui.column(8, ui.input_selectize("player_name2","Player 2",players, selected="Giannis Antetokounmpo")),
-                        ui.column(4, ui.input_selectize("season2","Season",seasons, selected="2024")),
+                        ui.column(4, ui.input_selectize("season2","Season",seasons, selected="2025")),
                     ),
                     ui.row(
                         ui.column(8, ui.input_selectize("player_name3","Player 3",players, selected="None")),
-                        ui.column(4, ui.input_selectize("season3","Season",seasons, selected="2024")),
+                        ui.column(4, ui.input_selectize("season3","Season",seasons, selected="2025")),
                     ),
                     ui.row(
                         ui.column(8, ui.input_selectize("player_name4","Player 4",players, selected="None")),
-                        ui.column(4, ui.input_selectize("season4","Season",seasons, selected="2024")),
+                        ui.column(4, ui.input_selectize("season4","Season",seasons, selected="2025")),
                     ),
                     width = 400,
                 ),
@@ -73,19 +73,19 @@ def team_dist_ui(vars: list[str],teams: list[str],seasons: list[str]):
                     ),
                     ui.row(
                         ui.column(8, ui.input_selectize("team_name1","Team 1",teams, selected="Denver Nuggets")),
-                        ui.column(4, ui.input_selectize("season1t","Season",seasons, selected="2024")),
+                        ui.column(4, ui.input_selectize("season1t","Season",seasons, selected="2025")),
                     ),
                     ui.row(
                         ui.column(8, ui.input_selectize("team_name2","Team 2",teams, selected="Miami Heat")),
-                        ui.column(4, ui.input_selectize("season2t","Season",seasons, selected="2024")),
+                        ui.column(4, ui.input_selectize("season2t","Season",seasons, selected="2025")),
                     ),
                     ui.row(
                         ui.column(8, ui.input_selectize("team_name3","Team 3",teams, selected="None")),
-                        ui.column(4, ui.input_selectize("season3t","Season",seasons, selected="2024")),
+                        ui.column(4, ui.input_selectize("season3t","Season",seasons, selected="2025")),
                     ),
                     ui.row(
                         ui.column(8, ui.input_selectize("team_name4","Team 4",teams, selected="None")),
-                        ui.column(4, ui.input_selectize("season4t","Season",seasons, selected="2024")),
+                        ui.column(4, ui.input_selectize("season4t","Season",seasons, selected="2025")),
                     ),
                     width = 400,
                 ),
