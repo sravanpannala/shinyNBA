@@ -27,7 +27,7 @@ data_DIR = "/var/data/shiny/"
 
 img_DIR = data_DIR + "player_images/"
 
-df = pd.read_parquet(data_DIR + "NBA_Player_Comparison_V3.parquet")
+df = pd.read_parquet(data_DIR + "NBA_Player_Comparison_V3_2024.parquet")
 
 questions = [
     "How often do you shoot the ball?",
@@ -58,7 +58,7 @@ app_ui = ui.page_fluid(
     ui.panel_title("NBA Pickup Comparison Finder v3.0"),
         ui.card_footer(ui.markdown("""
                 **Data and Idea**: [automaticnba](https://twitter.com/automaticnba/) | 
-                **Application**: [SravanNBA](https://twitter.com/SravanNBA/) | 
+                **Application**: [Sravan](https://twitter.com/sradjoker/) | 
                 **App Views**: {0}
             """.format(ui.output_text("views",inline=True))
             )
@@ -68,10 +68,10 @@ app_ui = ui.page_fluid(
     ui.card(
         ui.markdown(""" 
             Simply answer these **20 basic questions** about your basketball ability to 
-            see which NBA players from **2016-17** to **2022-23** your skills most match with  
+            see which NBA players from **2016-17** to **2023-24** your skills most match with  
                            
             Comparing to players with at least **500** minutes played during a season | 
-            Numbers for **2023-24** not available yet
+            Data updated till **2023-24** NBA Season
             """
         ),
     
