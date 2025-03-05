@@ -20,6 +20,7 @@ from plotnine import (
 
 from shiny import App, ui, render, reactive
 from shiny.types import ImgData
+from modules import league_ui, player_ui, league_server, player_server
 
 pd.options.mode.chained_assignment =  None
 
@@ -44,10 +45,11 @@ else:
     data_DIR = "/var/data/shiny/"
 
 filepath = data_DIR + "NBA_games_minutes_war_missed.parquet"
+filepath2 = data_DIR + "NBA_games_minutes_war_missed_table.parquet"
 tstamp = os.path.getmtime(filepath)
 date_updated = datetime.fromtimestamp(tstamp).strftime('%A %d %b, %Y - %H:%M:%S')
 df = pd.read_parquet(filepath)
-dff = df.drop(columns="colorsTeam")
+dfp = pd.read_parquet(filepath2)
 
 
 app_ui = ui.page_fluid(
@@ -76,8 +78,10 @@ app_ui = ui.page_fluid(
         ),
     
     ),
-    ui.output_plot("plot",  width="1000px", height="800px"),
-    ui.output_data_frame("output_table"),
+    ui.navset_tab(
+        league_ui("League"),
+        player_ui("Player"),
+    )
 )
 
 def server(input, output, session):
@@ -90,42 +94,6 @@ def server(input, output, session):
             txt = ""
         return txt
 
-    @render.data_frame
-    def output_table():
-        display_df = dff
-        # display_df.style.background_gradient(axis=0, cmap="PiYG")  
-        return render.DataGrid(display_df, filters=True)
-    
-    @render.plot(alt="Games Missed")
-    def plot():
-        lb_mean = df["LEBRON_WAR_Missed"].mean()
-        lb_mean = round(lb_mean,2)
-        # df1 = df.copy()
-        # df1["LEBRON_WAR_Missed"] = df1["LEBRON_WAR_Missed"] - lb_mean
-        # df1["LEBRON_WAR_Missed"] = df1["LEBRON_WAR_Missed"].round(3)
-        
-        p = (
-            ggplot(df, aes(x='Team', y='LEBRON_WAR_Missed'))
-            + geom_bar(aes(fill="colorsTeam"),stat="identity", alpha=0.7)
-            + geom_hline(yintercept=lb_mean, linetype="dashed")
-            + coord_flip()
-            + scale_color_identity(aesthetics=["fill"],guide=None)
-            # + theme_538(base_size=12)
-            + theme_classic(base_size=12)
-            + theme(
-                figure_size=(10,8),
-                plot_title=element_text(size=20, weight="bold"),
-            )
-            + labs(
-                title="Wins Missed",
-                subtitle=f"League Average = {lb_mean} WAR Missed\nPlayers missing the game due to injury/personal reasons/suspension",
-                caption="@sradjoker | Source: nba.com/stats, pbpstats, bball-index",
-                y= "Wins Missed",
-                x="",
-            )
-        )
-        return p
-
     @render.image
     def image():
         from pathlib import Path
@@ -133,7 +101,10 @@ def server(input, output, session):
         dir = Path(__file__).parent / "www"
         img: ImgData = {"src": str(dir) + "/" + "logo.webp", "width": "100px"}
         return img
-
+    
+    league_server(id="League",df=df)  # type: ignore
+    player_server(id="Player",df=dfp) # type: ignore
+    
 www_dir = Path(__file__).parent / "www"
 
 app = App(app_ui, server, static_assets=www_dir)
