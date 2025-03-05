@@ -149,7 +149,7 @@ app_ui = ui.page_fluid(
     ui.card(
         ui.panel_title(ui.h1("NBA Lineups Trends")),
         ui.card_footer(ui.h6(ui.markdown("""
-                **By**: [SravanNBA](https://twitter.com/SravanNBA/) | **Idea**: [Shamit Dua](https://twitter.com/FearTheBrown) | **App views**: {0}
+                **By**: [Sravan](https://twitter.com/sradjoker/) | **Idea**: [Shamit Dua](https://twitter.com/FearTheBrown) | **App views**: {0}
             """.format(ui.output_text("views",inline=True))
             ))
         )

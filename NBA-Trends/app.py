@@ -81,7 +81,7 @@ app_ui = ui.page_fluid(
     ui.card(
         ui.panel_title(ui.h2("NBA Stat Distribution and Trends")),
         ui.card_footer(ui.h5(ui.markdown("""
-                **By**: [SravanNBA](https://twitter.com/SravanNBA/)
+                **By**: [Sravan](https://twitter.com/sradjoker/)
             """
             ))
         )
