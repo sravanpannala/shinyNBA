@@ -55,7 +55,7 @@ else:
 df = pd.read_parquet(data_DIR + "lineup_data.parquet")
 teams_list = list(df["team"].unique())
 
-dff = df.query(f'team == "CLE"')
+dff = df.query(f'team == "Cleveland Cavaliers"')
 dff_t = dff[["pid","player"]]
 dff_t = dff_t.set_index("pid")
 player_dict = dff_t.to_dict('dict')['player']
