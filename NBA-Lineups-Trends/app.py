@@ -53,13 +53,13 @@ else:
     data_DIR = "/var/data/shiny/"
 
 df = pd.read_parquet(data_DIR + "lineup_data.parquet")
+df["pid"] = df["pid"].astype(str)
 teams_list = list(df["team"].unique())
-
-dff = df.query(f'team == "Cleveland Cavaliers"')
+team_init = "Cleveland Cavaliers"
+dff = df.query(f'team == "{team_init}"')
 dff_t = dff[["pid","player"]]
 dff_t = dff_t.set_index("pid")
 player_dict = dff_t.to_dict('dict')['player']
-
 init_players = ['1628378', '1628386', '1629731', '1629636', '1630596']
 
 basic_a = [
@@ -162,7 +162,7 @@ app_ui = ui.page_fluid(
         ), 
     ),
     ui.row(
-        ui.column(3,ui.input_selectize("team","Team",teams_list,selected="CLE")),
+        ui.column(3,ui.input_selectize("team","Team",teams_list,selected=team_init)),
         ui.column(9,ui.input_selectize("players","Lineup (Select Exactly 5 players)",player_dict, selected=init_players,multiple=True, width="70%")),
     ),
     ui.row(
@@ -264,7 +264,7 @@ def server(input, output, session):
                     y_int = pd.to_datetime(td, format="%H:%M:%S") # type: ignore
             scale_y = []
             if "Pct" in var or "Accuracy" in var or "Frequency" in var:
-                scale_y = scale_y_continuous(labels=percent_format())
+                scale_y = scale_y_continuous(labels=percent_format()) # type: ignore
             elif "Minutes" in var:
                 scale_y = scale_y_datetime(date_labels = "%M:%S")
             kwargs_legend = {"alpha":0.0}
@@ -308,6 +308,7 @@ def server(input, output, session):
                 + guides(color=guide_legend(ncol=2))
             )
         except Exception as error:
+            print(error)
             fig, ax = plt.subplots(1,1,figsize=(9,7))  
             ax.text(0.1, 0.95,str(error),horizontalalignment='left',verticalalignment='center',transform = ax.transAxes, fontsize=18)
             ax.axis('off')
