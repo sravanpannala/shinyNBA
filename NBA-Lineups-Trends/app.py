@@ -62,6 +62,8 @@ dff_t = dff_t.set_index("pid")
 player_dict = dff_t.to_dict('dict')['player']
 init_players = ['1628378', '1628386', '1629731', '1629636', '1630596']
 
+dfl = pd.read_parquet(data_DIR + "lineup_list_data.parquet")
+
 basic_a = [
     'PlusMinus',
     'TsPct',
@@ -157,23 +159,37 @@ app_ui = ui.page_fluid(
     ui.card(
         ui.markdown(""" 
             Plots Lineup stats for 2024-25 Regular Season. Powered by [PBP Stats API](https://api.pbpstats.com/docs).  
-            Trendline is calculated using Locally Weighted Scatterplot Smoothing. More information [here](https://ggplot2.tidyverse.org/reference/geom_smooth.html) 
+            Trendline is calculated using Locally Weighted Scatterplot Smoothing. More information [here](https://ggplot2.tidyverse.org/reference/geom_smooth.html).  
+            Please use the provided table (team lineups sorted by minutes played) to find possible lineup combinations if needed. 
             """
         ), 
     ),
-    ui.row(
-        ui.column(3,ui.input_selectize("team","Team",teams_list,selected=team_init)),
-        ui.column(9,ui.input_selectize("players","Lineup (Select Exactly 5 players)",player_dict, selected=init_players,multiple=True, width="70%")),
-    ),
-    ui.row(
-        ui.column(3,ui.input_selectize("stat","Stat",stats,multiple=False)),
-        ui.column(3,ui.input_selectize("stype","Stat Type",["Totals","Per 100 Possessions"],selected="Totals",multiple=False)),
-        ui.column(3,ui.input_action_button("go", "Go!", class_="btn-success",width="70%"),)
-    ),
-    ui.card(
-        ui.output_plot("plot",  width="900px", height="700px"),
-        # ui.output_ui("my_plot"),
-    ),
+    ui.layout_sidebar(
+        ui.sidebar(
+            ui.row(
+                ui.column(12,ui.input_selectize("team","Team",teams_list,selected=team_init)),
+            ),
+            ui.row(
+                ui.column(12,ui.input_selectize("players","Lineup (Select Exactly 5 players)",player_dict, selected=init_players,multiple=True, width="70%")),
+            ),
+            ui.row(
+                ui.column(12,ui.input_selectize("stat","Stat",stats,multiple=False)),
+            ),
+            ui.row(
+                ui.column(12,ui.input_selectize("stype","Stat Type",["Totals","Per 100 Possessions"],selected="Totals",multiple=False)),
+            ),
+            ui.row(
+                ui.column(12,ui.input_action_button("go", "Go!", class_="btn-success",width="70%"),)
+            ),
+            width="300px",
+        ),
+        ui.card(
+            ui.output_data_frame("output_table"), height=""
+        ),
+        ui.card(
+            ui.output_plot("plot",  width="900px", height="700px"),
+        ),    
+    )
 )
 
 def server(input, output, session):
@@ -207,7 +223,7 @@ def server(input, output, session):
     def get_lineup_data() -> tuple[pd.DataFrame, dict]:   
         player_dict = get_player_dict()
         lineup_in = list(input.players())
-        print(lineup_in)
+        # print(lineup_in)
         if len(lineup_in)!=5:
             raise Exception("Error: Please select exactly 5 players")
         # lineup_names = [player_dict[ll] for ll in lineup_in]
@@ -290,6 +306,7 @@ def server(input, output, session):
                 )
                 + theme_xkcd(base_size=16)
                 + theme(
+                    text=element_text(family=["Comic Sans MS"]),
                     plot_title=element_text(face="bold", size=20),
                     plot_subtitle=element_text(size=12),
                     plot_caption=element_text(ha="left"),
@@ -315,6 +332,12 @@ def server(input, output, session):
 
         return fig  
     
+    @render.data_frame
+    def output_table():
+        team = input.team()
+        display_df = dfl.query(f"team == '{team}'")
+        # display_df.style.background_gradient(axis=0, cmap="PiYG")  
+        return render.DataGrid(display_df, filters=True)
     # @render.ui
     # def my_plot():
     #     try:
