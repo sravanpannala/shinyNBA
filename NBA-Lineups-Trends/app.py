@@ -286,8 +286,8 @@ def server(input, output, session):
             kwargs_legend = {"alpha":0.0}
             fig = (
                 ggplot(df1,aes(x="Date",y=var1, color="TrendLine"))  
+                + geom_smooth(size=1.5, se=False, method="lowess", span=0.3)
                 + geom_point(fill="white",stroke=1.2)
-                + geom_smooth(size=1.5, se=False, method="lowess", span=0.5)
                 + geom_hline(aes(color="AvgLine",yintercept = y_int), linetype='dashed', show_legend=True)
                 + scale_x_datetime(date_labels="%b-%d", date_breaks="2 week")
                 + scale_color_manual(name="Trendline", values=["orangered","black"])
