@@ -230,7 +230,7 @@ def server(input, output, session):
                 x=var,
                 y="Frequency",
                 title=f"Stat Distribution:  {var}",
-                caption="@SravanNBA",
+                caption="@sradjoker",
             )
             + theme_xkcd(base_size=16)
             + theme(
@@ -283,7 +283,7 @@ def server(input, output, session):
                 x="Games Played",
                 y=var,
                 title=f"Stat Trends:  {var}",
-                caption="@SravanNBA",
+                caption="@sradjoker",
             )
             + theme_xkcd(base_size=16)
             + theme(

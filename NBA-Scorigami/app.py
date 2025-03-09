@@ -71,7 +71,7 @@ app_ui = ui.page_fluid(
     ui.card(
         ui.panel_title(ui.h1("NBA Box Scorigami")),
         ui.card_footer(ui.h6(ui.markdown("""
-                **By**: Sravan [bsky](https://bsky.app/profile/sradjoker.cc) [X](https://x.com/SravanNBA/) | **App views**: {0} | Updated on **{1} UTC**
+                **By**: Sravan [bsky](https://bsky.app/profile/sradjoker.cc) [X](https://x.com/sradjoker/) | **App views**: {0} | Updated on **{1} UTC**
             """.format(ui.output_text("views",inline=True),date_updated)
             ))
         )
