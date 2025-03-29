@@ -52,10 +52,14 @@ app_ui = ui.page_fluid(
             ))
         )
     ),
-    ui.row(
-        ui.column(6,ui.input_selectize("player","Player",players, selected="Kel'el Ware")),
-    ),
-    ui.output_data_frame("df_display"),
+    ui.layout_sidebar(
+        ui.sidebar(
+            ui.row(
+                ui.column(12,ui.input_selectize("player","Player",players, selected="Kel'el Ware")),
+            ),
+        ),
+        ui.output_data_frame("df_display"),
+    )
 )
 
 def server(input, output, session):
