@@ -7,6 +7,8 @@ from matplotlib.colors import to_hex
 
 from shiny import App, ui, render, reactive
 
+pd.options.mode.chained_assignment =  None
+
 if sys.platform == "win32":
 # Testing
     data_DIR = "C:\\Users\\pansr\\Documents\\shinyNBA\\data\\"
@@ -35,13 +37,6 @@ for i in np.linspace(0.7,0.25,21):
     colors.append(to_hex(cmap(i)))
 
 bgcolor = []
-b = {
-        "rows": [0],  
-        "style": {"background-color": "darkslateblue",
-                  "font-weight":"bold",
-                  "color":"white"},  
-    }
-bgcolor.append(b)
 for r in range(0,21):
     b = {
         "rows": [r],  
@@ -50,7 +45,13 @@ for r in range(0,21):
                   "font-weight":"bold"},  
     }
     bgcolor.append(b)
-
+b = {
+        "rows": [0],  
+        "style": {"background-color": "darkslateblue",
+                  "font-weight":"bold",
+                  "color":"white"},  
+    }
+bgcolor.append(b)
 
 app_ui = ui.page_fluid(
     ui.card(
@@ -87,7 +88,6 @@ def server(input, output, session):
         smax = df4["Similarity Score"].max()
         smin = df4["Similarity Score"].min()
         df4["y Score Normalized"]=100-(df4["Similarity Score"]-smin)/(smax-smin)*100
-        df4["y Score Normalized"] = round(df4["y Score Normalized"],2)
         df5 = df2s.join(df4)
         df5 = df5.iloc[:,1:]
         df6 = (df5
@@ -103,6 +103,8 @@ def server(input, output, session):
         df7 = df7.reset_index()
         df7.columns = colsd
         df8 = df7[colsf]
+        df8["Similarity"] = df8["Similarity"].round(1)
+        df8["bSPARQ"] = df8["bSPARQ"].round(1)
         dff = df8.copy()
         return dff
     
