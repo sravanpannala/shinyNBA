@@ -57,7 +57,8 @@ app_ui = ui.page_fluid(
         ui.panel_title(ui.h1("bSPARQ Athletic Similarity Scores")),
         ui.card_footer(ui.h6(ui.markdown("""
                 **By**: [Jared Dubin](https://twitter.com/JADubin5/),
-                        [Sravan](https://twitter.com/sradjoker/)
+                        [Sravan](https://twitter.com/sradjoker/),
+                        Jacob Sutton
             """
             ))
         )
@@ -79,14 +80,14 @@ def server(input, output, session):
             dfa.append(df2.iloc[i]-df2q)
         df3 = pd.concat(dfa).reset_index(drop=True)
         df4 = df3.map(lambda x: x**2)
-        df4.iloc[:,0] = 2*df4.iloc[:,0]
+        df4.iloc[:,0] = 4*df4.iloc[:,0]
         df4.iloc[:,1] = 4*df4.iloc[:,1]
         df4.iloc[:,3] = 4*df4.iloc[:,3]
         df4["Similarity Score"] = np.sqrt(df4.sum(axis=1))
         smax = df4["Similarity Score"].max()
         smin = df4["Similarity Score"].min()
         df4["y Score Normalized"]=100-(df4["Similarity Score"]-smin)/(smax-smin)*100
-        df4["y Score Normalized"] = round(df4["y Score Normalized"],1)
+        df4["y Score Normalized"] = round(df4["y Score Normalized"],2)
         df5 = df2s.join(df4)
         df5 = df5.iloc[:,1:]
         df6 = (df5
