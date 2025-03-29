@@ -64,7 +64,7 @@ def plt_dist(df1: DataFrame, var: str, group: str):
             x=var,
             y="Frequency",
             title=f"NBA Stat Distribution:  {var}",
-            caption="@SravanNBA",
+            caption="@sradjoker",
         )
         + theme_xkcd(base_size=14)
         + theme(
@@ -114,7 +114,7 @@ def plt_trends(df1: DataFrame, var: str, group: str):
             x="Games Played",
             y=var,
             title=f"NBA Stat Trends:  {var}",
-            caption="@SravanNBA",
+            caption="@sradjoker",
         )
         + theme_xkcd(base_size=14)
         # + theme_538(base_size=14)
