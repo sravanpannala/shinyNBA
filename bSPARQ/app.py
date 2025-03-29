@@ -103,8 +103,8 @@ def server(input, output, session):
         df7 = df7.reset_index()
         df7.columns = colsd
         df8 = df7[colsf]
-        df8["Similarity"] = df8["Similarity"].round(1)
-        df8["bSPARQ"] = df8["bSPARQ"].round(1)
+        df8["Similarity"] = df8["Similarity"].round(2)
+        df8["bSPARQ"] = df8["bSPARQ"].round(2)
         dff = df8.copy()
         return dff
     
