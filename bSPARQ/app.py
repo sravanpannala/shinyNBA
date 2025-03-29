@@ -52,7 +52,9 @@ app_ui = ui.page_fluid(
             ))
         )
     ),
-    ui.input_selectize("player","Player",players, selected="Kel'el Ware"),
+    ui.row(
+        ui.column(6,ui.input_selectize("player","Player",players, selected="Kel'el Ware")),
+    ),
     ui.output_data_frame("df_display"),
 )
 
