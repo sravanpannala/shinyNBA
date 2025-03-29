@@ -111,6 +111,7 @@ def server(input, output, session):
         return render.DataGrid(
             display_df,
             styles=bgcolor,
+            height='750px',
             )
 
 app = App(app_ui, server)
