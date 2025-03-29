@@ -27,6 +27,7 @@ cols3 = ["Player","Year","POSITION","HEIGHT","WEIGHT","WINGSPAN","STANDING REACH
 colsd = ["Rank","Player","Year","Position","Height","Weight",
          "Wingspan","Reach","Lane Agility","3/4 Sprint","Standing Vert","Max Vert",
          "bSPARQ","Similarity"]
+colsf = ["Rank","Player","Year","Position","bSPARQ","Similarity"]
 
 cmap = plt.get_cmap('Greens')
 colors = []
@@ -37,8 +38,9 @@ bgcolor = []
 for r in range(0,21):
     b = {
         "rows": [r],  
-        "cols": [13],  
-        "style": {"background-color": colors[r]},  
+        "cols": [5],  
+        "style": {"background-color": colors[r],
+                  "font-weight":"bold"},  
     }
     bgcolor.append(b)
 
@@ -95,7 +97,8 @@ def server(input, output, session):
         df7 = df6[cols3]
         df7 = df7.reset_index()
         df7.columns = colsd
-        dff = df7.copy()
+        df8 = df7[colsf]
+        dff = df8.copy()
         return dff
     
     @render.data_frame
