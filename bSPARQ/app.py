@@ -35,6 +35,13 @@ for i in np.linspace(0.7,0.25,21):
     colors.append(to_hex(cmap(i)))
 
 bgcolor = []
+b = {
+        "rows": [0],  
+        "style": {"background-color": "darkslateblue",
+                  "font-weight":"bold",
+                  "color":"white"},  
+    }
+bgcolor.append(b)
 for r in range(0,21):
     b = {
         "rows": [r],  
