@@ -1,9 +1,9 @@
 import os, sys
 import numpy as np
 import pandas as pd
-# import matplotlib.pyplot as plt
-# from plotnine.ggplot import ggplot
-# from plotnine import geom_density
+import matplotlib.pyplot as plt
+import matplotlib.pyplot as plt
+from matplotlib.colors import to_hex
 
 from shiny import App, ui, render, reactive
 
@@ -28,6 +28,21 @@ colsd = ["Rank","Player","Year","Position","Height","Weight",
          "Wingspan","Reach","Lane Agility","3/4 Sprint","Standing Vert","Max Vert",
          "bSPARQ","Similarity"]
 
+cmap = plt.get_cmap('Greens')
+colors = []
+for i in np.linspace(0.7,0.25,21):
+    colors.append(to_hex(cmap(i)))
+
+bgcolor = []
+for r in range(0,21):
+    b = {
+        "rows": [r],  
+        "cols": [13],  
+        "style": {"background-color": colors[r]},  
+    }
+    bgcolor.append(b)
+
+
 app_ui = ui.page_fluid(
     ui.card(
         ui.panel_title(ui.h1("bSPARQ Athletic Similarity Scores")),
@@ -37,11 +52,7 @@ app_ui = ui.page_fluid(
             ))
         )
     ),
-    # ui.row(
-    #     ui.column(4,ui.input_selectize("player","Player",players, selected="Alexandre Sarr")),
-    #     ui.column(8,ui.output_data_frame("df_display")),
-    # ),
-    ui.input_selectize("player","Player",players, selected="Dalton Knecht"),
+    ui.input_selectize("player","Player",players, selected="Kel'el Ware"),
     ui.output_data_frame("df_display"),
 )
 
@@ -84,6 +95,9 @@ def server(input, output, session):
     @render.data_frame
     def df_display():
         display_df = filtered_df()
-        return render.DataGrid(display_df, filters=False)
+        return render.DataGrid(
+            display_df,
+            styles=bgcolor,
+            )
 
 app = App(app_ui, server)
