@@ -52,18 +52,28 @@ app_ui = ui.page_fluid(
     ),
     ui.card(
         ui.markdown(""" 
-            Predicting playoff probilities using various publicly availalbe advanced metrics.  
-            Chose the 1st team and the 2nd team and you'll get the probabilities for that combination. 
-            You can get probabilities for any combination of playoff teams.
+            Predicting playoff probilities using various publicly available advanced metrics.  
+            Choose the 1st team and the 2nd team and you'll get the probabilities for that combination. You can get probabilities for any combination of playoff teams.  
+            For detailed explanation and methodology, scroll down to the bottom of the page.
             """
         ), 
     ),
     
     ui.row(
-        ui.column(6, ui.input_selectize("t1","Team 1",teams, selected="CLE")),
-        ui.column(6, ui.input_selectize("t2","Team 2",teams, selected="ATL")),
+        ui.column(6, ui.input_selectize("t1","Team 1",teams, selected="LAL")),
+        ui.column(6, ui.input_selectize("t2","Team 2",teams, selected="MIN")),
     ),
     ui.output_data_frame("df_display"),
+    ui.card(
+        ui.markdown("""
+            ## Methodology
+            For the metric models, each one of the metrics is multiplied by projected minutes (provided by [@AmericanNumbers](https://twitter.com/AmericanNumbers/)), summed up by team to get projected team impact ratings for each metric. These projected team impact ratings for each metric are then used to predict playoff game outcomes (using the team rating, opponent team rating and which team was at home). This generates probabilities for each team to win a playoff game at home and on the road. Then each series is simulated 10,000 times using these probablities to get series probabilities.  
+            For the `predict_series_ridge` model, the structure of the model is different. One of the difficulties with projecting series is developing a good minutes model. And so the metric models are highly dependent on how good the minutes projections are. This model predicts the series outcome (win in 4, win in 5, etc.) using an ordinal logistic ridge regression. So it is different because there is no prediction made for each game. That is one of the drawbacks to the model: it just predicts each series. But one of the benefits is that instead of needing good minute projections for each player, the model instead uses a top 8 rotation for each team where each player is ranked based on where they rank in predictive epm. So it looks something like this: predictive epm best player + predictive epm 2nd best player and so on until you get the top 8 players in the rotation. This is used for the ranking of the top 8. Then predictive epm, lebron and darko for the top 8 players are used in the model. Some of our other bball-index stats are also used such as Overall Shooting Talent, Catch and Shoot 3pt Talent, Ball Dominance etc. And again, the Overall Shooting Talent etc. for the best player is based on which player is ranked the highest on the team in predictive epm.  
+            In addition to these player stats, other team stats are used like rim attempt rate, corner 3pt rate, above the break 3pt rate etc. as well as the opponent's stats so that the style of the team and opponent can be captured. Also included are regular season series win/loss record + Net Rating in the matchups so that if a team goes 4-0 in a matchup and wins every regular season game easily, that effect can be included.  
+            All of these models were run for every possible matchup combination that can happen in this 2025 playoffs, including possible Finals matchups. Tiebreakers like opponent conference record for a possible Nuggets-Pacers series were also included (the teams split their season series).     
+            """
+        ), 
+    ),
 )
 
 
@@ -90,7 +100,7 @@ def server(input, output, session):
     def get_bgcolor():
         dff = filtered_df()
         bgcolor = []
-        for r in range(8):
+        for r in range(9):
             for c in range(3,5):
                 colors = colors1
                 ci = int(dff.iloc[r,c].round()) # type: ignore
