@@ -105,19 +105,7 @@ def server(input, output, session):
     def get_bgcolor():
         dff = filtered_df()
         bgcolor = []
-        r = 0
-        c = 2
-        b = {
-            "rows": [r],  
-            "cols": [c],  
-            "style": {
-                "background-color": "grey",
-                "font-weight":"bold",
-                "color":"white",
-            },  
-        }
-        bgcolor.append(b)
-        for r in range(9):
+        for r in range(8):
             for c in range(3,5):
                 colors = colors1
                 ci = int(dff.iloc[r,c].round()) # type: ignore
