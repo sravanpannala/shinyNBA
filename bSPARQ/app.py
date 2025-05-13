@@ -16,6 +16,9 @@ else:
     data_DIR = "/var/data/shiny/"
 
 df1 = pd.read_csv(data_DIR + "bSPARQ_data.csv")
+df1 = df1.sort_values(["Player","Year"])
+df1 = df1.drop_duplicates(subset=["Player"],keep="last")
+df1 = df1.reset_index(drop=True)
 df2 = df1.iloc[:,52:-2]
 df2s = df1.iloc[:,:52]
 players1 = df1["Player"].unique()
