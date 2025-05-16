@@ -10,7 +10,7 @@ pd.options.mode.chained_assignment =  None
 
 if sys.platform == "win32":
 # Testing
-    data_DIR = "C:\\Users\\pansr\\Documents\\shinyNBA\\data\\"
+    data_DIR = "C:\\Users\\pansr\\repos\\shinyNBA\\data\\"
 else:
 # Deployment
     data_DIR = "/var/data/shiny/"
@@ -19,8 +19,8 @@ df1 = pd.read_csv(data_DIR + "bSPARQ_data.csv")
 df1 = df1.sort_values(["Player","Year"])
 df1 = df1.drop_duplicates(subset=["Player"],keep="last")
 df1 = df1.reset_index(drop=True)
-df2 = df1.iloc[:,52:-2]
-df2s = df1.iloc[:,:52]
+df2 = df1.iloc[:,51:-2]
+df2s = df1.iloc[:,:51]
 players1 = df1["Player"].unique()
 players = {p: p for p in players1}
 
@@ -67,7 +67,7 @@ app_ui = ui.page_fluid(
         )
     ),
     ui.row(
-        ui.column(12,ui.input_selectize("player","Player",players, selected="Kel'el Ware")),
+        ui.column(12,ui.input_selectize("player","Player",players, selected="Cooper Flagg")),
     ),
     ui.output_data_frame("df_display"),
 )
@@ -77,7 +77,7 @@ def server(input, output, session):
     def filtered_df() -> pd.DataFrame:
         pl = input.player()
         df1q = df1.query(f'Player == "{pl}"')
-        df2q = df1q.iloc[:,52:-2]
+        df2q = df1q.iloc[:,51:-2]
         dfa = []
         for i in range(len(df2)):
             dfa.append(df2.iloc[i]-df2q)
@@ -91,7 +91,6 @@ def server(input, output, session):
         smin = df4["Similarity Score"].min()
         df4["y Score Normalized"]=100-(df4["Similarity Score"]-smin)/(smax-smin)*100
         df5 = df2s.join(df4)
-        df5 = df5.iloc[:,1:]
         df6 = (df5
         .sort_values("y Score Normalized",ascending=False)
         .head(21).reset_index(drop=True))
