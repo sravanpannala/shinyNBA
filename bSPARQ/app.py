@@ -15,7 +15,7 @@ else:
 # Deployment
     data_DIR = "/var/data/shiny/"
 
-df1 = pd.read_csv(data_DIR + "bSPARQ_data.csv")
+df1 = pd.read_csv(data_DIR + "bSPARQ_data_V2.csv")
 df1 = df1.sort_values(["Player","Year"])
 df1 = df1.drop_duplicates(subset=["Player"],keep="last")
 df1 = df1.reset_index(drop=True)
