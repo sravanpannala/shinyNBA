@@ -67,7 +67,7 @@ app_ui = ui.page_fluid(
         )
     ),
     ui.row(
-        ui.column(12,ui.input_selectize("player","Player",players, selected="Cooper Flagg")),
+        ui.column(12,ui.input_selectize("player","Player",players, selected="AJ Dybantsa")),
     ),
     ui.output_data_frame("df_display"),
 )
