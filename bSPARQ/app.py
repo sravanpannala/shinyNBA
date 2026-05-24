@@ -59,7 +59,7 @@ app_ui = ui.page_fluid(
     ui.card(
         ui.panel_title(ui.h1("bSPARQ Athletic Similarity Scores")),
         ui.card_footer(ui.h6(ui.markdown("""
-                **By**: [Jared Dubin](https://twitter.com/JADubin5/),
+                **By**: [Jared Dubin](https://bsky.app/profile/jadubin5.bsky.social),
                         [Sravan](https://twitter.com/sradjoker/),
                         Jacob Sutton
             """
